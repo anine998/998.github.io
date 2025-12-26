@@ -33,48 +33,33 @@
 
     .wrap{max-width:1040px;margin:0 auto;padding:44px 20px 80px}
 
-    /* top bar */
     .top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:22px;
+      display:flex;justify-content:space-between;align-items:center;
+      gap:14px;flex-wrap:wrap;margin-bottom:22px;
     }
     .chips{display:flex;gap:10px;flex-wrap:wrap}
     .chip{
-      display:inline-flex;
-      align-items:center;
-      padding:8px 12px;
-      border-radius:999px;
+      display:inline-flex;align-items:center;
+      padding:8px 12px;border-radius:999px;
       border:1px solid var(--line);
       background:rgba(0,0,0,.12);
       color:var(--sub);
-      font-size:13px;
-      letter-spacing:.2px;
+      font-size:13px;letter-spacing:.2px;
       backdrop-filter: blur(6px);
     }
 
-    /* home link button */
     .home a{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 14px;border-radius:999px;
       border:1px solid var(--line);
       background:rgba(0,0,0,.18);
     }
     .home a:hover{background:rgba(0,0,0,.28)}
 
-    /* hero */
     .hero{margin-top:8px;margin-bottom:18px}
     .kicker{
-      margin:0 0 10px;
-      color:var(--sub);
-      font-size:14px;
-      letter-spacing:.2px;
+      margin:0 0 10px;color:var(--sub);
+      font-size:14px;letter-spacing:.2px;
     }
     .title{
       margin:0;
@@ -91,7 +76,6 @@
       max-width: 78ch;
     }
 
-    /* layout */
     .grid{
       display:grid;
       grid-template-columns:repeat(12,1fr);
@@ -111,34 +95,65 @@
 
     h2{margin:0 0 10px;font-size:18px}
     p{margin:0;color:var(--sub);line-height:1.9}
-
-    .message{
-      font-size:16px;
-    }
+    .message{font-size:16px}
     .message p + p{margin-top:10px}
 
-    .quote{
-      margin-top:10px;
-      padding:14px 14px;
-      border-radius:14px;
+    /* Omikuji */
+    .omikujiBox{
+      margin-top:12px;
       border:1px solid rgba(35,48,77,.75);
       background:rgba(0,0,0,.12);
-      color:var(--text);
-      line-height:1.9;
+      border-radius:14px;
+      padding:14px;
     }
-
+    .resultTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(35,48,77,.75);
+      background:rgba(0,0,0,.14);
+      color:var(--sub);
+      font-size:12px;
+    }
+    .kw{
+      margin:6px 0 2px;
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:.3px;
+      color:var(--text);
+    }
+    .line{
+      margin:0;
+      color:var(--sub);
+      line-height:1.9;
+      font-size:15px;
+    }
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .btn{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      margin-top:14px;
       padding:10px 12px;
       border-radius:12px;
       border:1px solid var(--line);
       background:rgba(0,0,0,.15);
       color:var(--text);
+      cursor:pointer;
+      user-select:none;
     }
     .btn:hover{background:rgba(0,0,0,.26)}
+    .btn:active{transform: translateY(1px)}
+    .smallNote{margin-top:10px;color:var(--sub);font-size:13px;line-height:1.7}
 
     .footer{margin-top:26px;color:var(--sub);font-size:13px}
   </style>
@@ -151,6 +166,7 @@
       <div class="chips">
         <span class="chip">new year 2026</span>
         <span class="chip">年賀状</span>
+        <span class="chip">おみくじ</span>
       </div>
 
       <!-- 保留 Portfolio Home 链接 -->
@@ -164,7 +180,7 @@
       <h1 class="title">2026 年賀状</h1>
       <p class="subtitle">
         新しい一年が、やさしく始まりますように。<br />
-        ここは、2026年に向けた短いメッセージを残すページです。
+        下の「おみくじ」を引くと、新年のキーワードと一言メッセージが出ます。
       </p>
     </section>
 
@@ -180,16 +196,26 @@
         </div>
       </div>
 
+      <!-- 抽签模块：替代原 To-Do -->
       <div class="card half">
-        <h2>Wishes</h2>
-        <div class="message">
-          <p>
-            迷う日があっても、今日の小さな一歩が、未来の自分を助けてくれるはずです。
-          </p>
-          <div class="quote">
-            健康で、あたたかく、<br />
-            いい出会いに恵まれますように。<br />
-            そして、あなたの創作と挑戦が、静かに実を結びますように。
+        <h2>おみくじ（クリックで抽選）</h2>
+
+        <div class="omikujiBox" aria-live="polite">
+          <div class="resultTop">
+            <span class="badge" id="omikujiType">新年キーワード</span>
+            <span class="badge" id="omikujiDate">—</span>
+          </div>
+
+          <div class="kw" id="omikujiKeyword">まだ引いていません</div>
+          <p class="line" id="omikujiLine">ボタンを押して、2026の一言を受け取ってください。</p>
+
+          <div class="btnRow">
+            <button class="btn" id="drawBtn" type="button">おみくじを引く</button>
+            <button class="btn" id="copyBtn" type="button">結果をコピー</button>
+          </div>
+
+          <div class="smallNote">
+            ※ 何度でも引けます。気に入った言葉が出たら、それが今日の正解です。
           </div>
         </div>
       </div>
@@ -200,7 +226,6 @@
           このページは「まず公開して、あとから育てる」ための小さな年賀状として作りました。<br />
           もしよければ、またふらっと覗きに来てください。
         </p>
-
         <a class="btn" href="https://github.com/anine998/998.github.io" target="_blank" rel="noreferrer">
           Source / GitHub
         </a>
@@ -209,7 +234,64 @@
 
     <div class="footer">© 2026 / your name</div>
   </div>
+
+  <script>
+    // おみくじデータ（短く、年賀状ページに合うトーン）
+    const OMikuji = [
+      { type: "キーワード", keyword: "整える", line: "少し片づけるだけで、気持ちも前に進みます。" },
+      { type: "キーワード", keyword: "余白", line: "予定を詰めすぎないことが、運を呼び込みます。" },
+      { type: "キーワード", keyword: "出会い", line: "小さな会話が、大きな縁につながります。" },
+      { type: "キーワード", keyword: "継続", line: "派手じゃなくていい。続けた人が強いです。" },
+      { type: "キーワード", keyword: "挑戦", line: "やってみる前から、答えを決めなくて大丈夫。" },
+      { type: "祝福", keyword: "健康第一", line: "体が整うと、運も自然とついてきます。" },
+      { type: "祝福", keyword: "順風満帆", line: "焦らず、確実に。あなたのペースで進めばいい。" },
+      { type: "祝福", keyword: "心穏やかに", line: "心が静かだと、必要なものがよく見えます。" },
+      { type: "一句", keyword: "光は、積もる", line: "小さな良いことが、来年の景色を変えます。" },
+      { type: "一句", keyword: "一歩が道になる", line: "今日の一歩が、2026年の地図になります。" },
+      { type: "一句", keyword: "追い風は後ろにある", line: "積み上げた経験が、背中を押してくれます。" },
+      { type: "一句", keyword: "花は遅れて咲く", line: "タイミングは人それぞれ。焦らなくていい。" }
+    ];
+
+    function nowStamp(){
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      return `${y}-${m}-${day} ${hh}:${mm}`;
+    }
+
+    function draw(){
+      const pick = OMikuji[Math.floor(Math.random() * OMikuji.length)];
+      document.getElementById("omikujiType").textContent = pick.type;
+      document.getElementById("omikujiKeyword").textContent = pick.keyword;
+      document.getElementById("omikujiLine").textContent = pick.line;
+      document.getElementById("omikujiDate").textContent = nowStamp();
+      window.__lastOmikuji = `【${pick.type}】${pick.keyword} — ${pick.line}`;
+    }
+
+    async function copyResult(){
+      const text = window.__lastOmikuji || "（まだ引いていません）";
+      try{
+        await navigator.clipboard.writeText(text);
+        const prev = document.getElementById("copyBtn").textContent;
+        document.getElementById("copyBtn").textContent = "コピーしました";
+        setTimeout(()=>{ document.getElementById("copyBtn").textContent = prev; }, 900);
+      }catch(e){
+        alert("コピーに失敗しました。手動で選択してコピーしてください。");
+      }
+    }
+
+    document.getElementById("drawBtn").addEventListener("click", draw);
+    document.getElementById("copyBtn").addEventListener("click", copyResult);
+
+    // 初回ロード時に1回引く（任意。不要なら次の行を削除）
+    draw();
+  </script>
 </body>
 </html>
+
+ 
 
    
