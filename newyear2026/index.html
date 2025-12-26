@@ -3,84 +3,213 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>new year 2026 | Portfolio</title>
+  <title>2026 年賀状 | new year 2026</title>
+  <meta name="description" content="2026年に向けた年賀状ページ。ポートフォリオ配下の挨拶・メッセージ。" />
+
   <style>
-    :root{--bg:#0b0f19;--card:#121a2a;--text:#e8eefc;--sub:#b9c6e6;--line:#23304d}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
-      background:radial-gradient(1200px 800px at 20% 10%, #1a2a6c 0%, transparent 60%),
-                 radial-gradient(900px 700px at 80% 30%, #b21f1f 0%, transparent 55%),
-                 radial-gradient(1000px 800px at 60% 90%, #0f8b8d 0%, transparent 55%),
-                 var(--bg);
+    :root{
+      --bg:#0b0f19;
+      --card: rgba(18,26,42,.82);
+      --text:#e8eefc;
+      --sub:#b9c6e6;
+      --line: rgba(35,48,77,.9);
+      --shadow: 0 14px 46px rgba(0,0,0,.26);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 18% 12%, rgba(26,42,108,.92) 0%, transparent 60%),
+        radial-gradient(900px 700px at 82% 30%, rgba(178,31,31,.86) 0%, transparent 55%),
+        radial-gradient(1000px 800px at 60% 92%, rgba(15,139,141,.92) 0%, transparent 55%),
+        var(--bg);
+    }
+    a{color:var(--text);text-decoration:none}
+    a:hover{opacity:.92}
+
+    .wrap{max-width:1040px;margin:0 auto;padding:44px 20px 80px}
+
+    /* top bar */
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+    .chips{display:flex;gap:10px;flex-wrap:wrap}
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.12);
+      color:var(--sub);
+      font-size:13px;
+      letter-spacing:.2px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* home link button */
+    .home a{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+    }
+    .home a:hover{background:rgba(0,0,0,.28)}
+
+    /* hero */
+    .hero{margin-top:8px;margin-bottom:18px}
+    .kicker{
+      margin:0 0 10px;
+      color:var(--sub);
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .title{
+      margin:0;
+      font-weight:850;
+      letter-spacing:.5px;
+      line-height:1.05;
+      font-size: clamp(46px, 7.6vw, 82px);
+    }
+    .subtitle{
+      margin:14px 0 0;
+      color:var(--sub);
+      line-height:1.85;
+      font-size:16px;
+      max-width: 78ch;
+    }
+
+    /* layout */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:14px;
+      margin-top:18px;
+    }
+    .card{
+      grid-column:span 12;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px 18px 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    @media (min-width:880px){.half{grid-column:span 6}}
+
+    h2{margin:0 0 10px;font-size:18px}
+    p{margin:0;color:var(--sub);line-height:1.9}
+
+    .message{
+      font-size:16px;
+    }
+    .message p + p{margin-top:10px}
+
+    .quote{
+      margin-top:10px;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid rgba(35,48,77,.75);
+      background:rgba(0,0,0,.12);
+      color:var(--text);
+      line-height:1.9;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-top:14px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.15);
       color:var(--text);
     }
-    .wrap{max-width:960px;margin:0 auto;padding:56px 20px 80px}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-    a{color:var(--text);text-decoration:none;border-bottom:1px solid rgba(232,238,252,.35)}
-    a:hover{border-bottom-color:rgba(232,238,252,.8)}
-    h1{margin:18px 0 8px;font-size:40px;letter-spacing:.3px}
-    .sub{color:var(--sub);line-height:1.7;margin:0 0 22px}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:18px}
-    .card{grid-column:span 12;background:rgba(18,26,42,.82);border:1px solid rgba(35,48,77,.9);
-      border-radius:16px;padding:18px 18px 16px;backdrop-filter: blur(6px)}
-    @media (min-width:840px){.half{grid-column:span 6}}
-    .tag{display:inline-block;font-size:12px;padding:6px 10px;border:1px solid var(--line);
-      border-radius:999px;color:var(--sub);margin-right:8px}
-    ul{margin:10px 0 0 18px;color:var(--sub);line-height:1.8}
-    .footer{margin-top:22px;color:var(--sub);font-size:13px}
-    .btn{display:inline-block;margin-top:10px;padding:10px 12px;border-radius:12px;
-      border:1px solid var(--line);background:rgba(0,0,0,.15)}
+    .btn:hover{background:rgba(0,0,0,.26)}
+
+    .footer{margin-top:26px;color:var(--sub);font-size:13px}
   </style>
 </head>
+
 <body>
   <div class="wrap">
+
     <div class="top">
-      <div>
-        <span class="tag">new year 2026</span>
-        <span class="tag">準備記録</span>
+      <div class="chips">
+        <span class="chip">new year 2026</span>
+        <span class="chip">年賀状</span>
       </div>
-      <div>
+
+      <!-- 保留 Portfolio Home 链接 -->
+      <div class="home">
         <a href="/">← Portfolio Home</a>
       </div>
     </div>
 
-    <h1>new year 2026 を準備し始める</h1>
-    <p class="sub">
-      2026年に向けた小さな準備ページ。コンセプト・制作ログ・次にやることを1ページでまとめる。
-      <br/>（最小構成でまず公開→あとから育てる）
-    </p>
+    <section class="hero">
+      <p class="kicker">ポートフォリオ配下ページ / 2026の挨拶</p>
+      <h1 class="title">2026 年賀状</h1>
+      <p class="subtitle">
+        新しい一年が、やさしく始まりますように。<br />
+        ここは、2026年に向けた短いメッセージを残すページです。
+      </p>
+    </section>
 
     <div class="grid">
       <div class="card half">
-        <h2 style="margin:0 0 6px;font-size:18px;">Concept</h2>
-        <ul>
-          <li>テーマ：新しい一年を「制作の起点」にする</li>
-          <li>キーワード：整理 / 再出発 / 小さく公開</li>
-          <li>ビジュアル方針：暗背景＋光のグラデーション</li>
-        </ul>
+        <h2>Greeting</h2>
+        <div class="message">
+          <p>明けましておめでとうございます。</p>
+          <p>
+            2026年が、あなたにとって「心が落ち着く時間」と「前に進めるきっかけ」が
+            どちらも増える一年になりますように。
+          </p>
+        </div>
       </div>
 
       <div class="card half">
-        <h2 style="margin:0 0 6px;font-size:18px;">To-Do（次にやる）</h2>
-        <ul>
-          <li>年賀状のビジュアル案を1枚追加</li>
-          <li>2026の目標を3つに絞る</li>
-          <li>制作ログを週1で追記</li>
-        </ul>
+        <h2>Wishes</h2>
+        <div class="message">
+          <p>
+            迷う日があっても、今日の小さな一歩が、未来の自分を助けてくれるはずです。
+          </p>
+          <div class="quote">
+            健康で、あたたかく、<br />
+            いい出会いに恵まれますように。<br />
+            そして、あなたの創作と挑戦が、静かに実を結びますように。
+          </div>
+        </div>
       </div>
 
       <div class="card">
-        <h2 style="margin:0 0 6px;font-size:18px;">Log</h2>
-        <ul>
-          <li>2025-12-26：ページを作成し、公開</li>
-          <li>（ここに追記していく）</li>
-        </ul>
-        <a class="btn" href="https://github.com/" target="_blank" rel="noreferrer">Source / GitHub</a>
+        <h2>Note</h2>
+        <p>
+          このページは「まず公開して、あとから育てる」ための小さな年賀状として作りました。<br />
+          もしよければ、またふらっと覗きに来てください。
+        </p>
+
+        <a class="btn" href="https://github.com/anine998/998.github.io" target="_blank" rel="noreferrer">
+          Source / GitHub
+        </a>
       </div>
     </div>
 
-    <div class="footer">
-      © 2026 / your name
-    </div>
+    <div class="footer">© 2026 / your name</div>
   </div>
 </body>
 </html>
+
+   
