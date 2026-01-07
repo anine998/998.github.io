@@ -555,7 +555,8 @@
       <div class="hero">
         <div class="titleBox">
           <div class="bigTitle">
-            <div class="luck" id="tLuck">LUCK</div>
+            <!-- FIX #1: LUCK -> LUCKY -->
+            <div class="luck" id="tLuck">LUCKY</div>
             <div class="y2026">2026</div>
           </div>
           <div class="subtitle" id="tSubtitle">
@@ -697,7 +698,7 @@ const I18N = {
     gen:"Generate",
     music:"Lucky Song",
     hint:"Music requires a click to play (browser policy). File: haoyunlai.mp3",
-    luckyColor:"Lucky colors",
+    luckyColor:"Lucky color",
     luckyNum:"Lucky numbers",
     wealthDir:"Wealth direction",
     five:"Five elements",
@@ -783,6 +784,34 @@ function dirToAbbr(dir){
   return m[dir] || "—";
 }
 
+/* FIX #2: localized direction label */
+function dirLabel(dirCN, lang){
+  const abbr = dirToAbbr(dirCN);
+  if(!abbr || abbr === "—") return "—";
+  if(lang === "zh") return dirCN;
+
+  if(lang === "ja"){
+    const m = {
+      N:"北", S:"南", E:"東", W:"西",
+      NE:"北東", NW:"北西", SE:"南東", SW:"南西",
+      NNE:"北北東", ENE:"東北東", ESE:"東南東", SSE:"南南東",
+      SSW:"南南西", WSW:"西南西", WNW:"西北西", NNW:"北北西"
+    };
+    return m[abbr] || abbr;
+  }
+
+  if(lang === "en"){
+    const m = {
+      N:"North", S:"South", E:"East", W:"West",
+      NE:"Northeast", NW:"Northwest", SE:"Southeast", SW:"Southwest",
+      NNE:"North-northeast", ENE:"East-northeast", ESE:"East-southeast", SSE:"South-southeast",
+      SSW:"South-southwest", WSW:"West-southwest", WNW:"West-northwest", NNW:"North-northwest"
+    };
+    return m[abbr] || abbr;
+  }
+  return dirCN;
+}
+
 /* Fit big direction text to its box */
 function fitDirText(){
   const box = el("dirV");
@@ -804,7 +833,6 @@ function fitDirText(){
    Lucky colors / Five elements
 ========================= */
 const ELEMENTS = ["wood","fire","earth","metal","water"];
-const ELEMENT_LABEL_ZH = {wood:"木",fire:"火",earth:"土",metal:"金",water:"水"};
 const BAR_COLORS = {
   wood:"#2fb86a",
   fire:"#ff3b3b",
@@ -812,31 +840,33 @@ const BAR_COLORS = {
   metal:"#b8b8b8",
   water:"#2a7bff"
 };
+
+/* FIX #3: color objects include localized names */
 const COLOR_PALETTES = {
   wood: [
-    {nameZH:"青绿", hex:"#2fb86a"},
-    {nameZH:"翠绿", hex:"#22c55e"},
-    {nameZH:"墨绿", hex:"#0f766e"}
+    {nameZH:"青绿", nameJA:"青緑", nameEN:"Teal Green", hex:"#2fb86a"},
+    {nameZH:"翠绿", nameJA:"翠緑", nameEN:"Emerald Green", hex:"#22c55e"},
+    {nameZH:"墨绿", nameJA:"深緑", nameEN:"Deep Green", hex:"#0f766e"}
   ],
   fire: [
-    {nameZH:"正红", hex:"#ff2b2b"},
-    {nameZH:"珊瑚", hex:"#ff6b6b"},
-    {nameZH:"橙红", hex:"#ff5a2a"}
+    {nameZH:"正红", nameJA:"レッド", nameEN:"Red", hex:"#ff2b2b"},
+    {nameZH:"珊瑚", nameJA:"コーラル", nameEN:"Coral", hex:"#ff6b6b"},
+    {nameZH:"橙红", nameJA:"オレンジレッド", nameEN:"Orange Red", hex:"#ff5a2a"}
   ],
   earth: [
-    {nameZH:"金黄", hex:"#ffcc5a"},
-    {nameZH:"琥珀", hex:"#ffb84a"},
-    {nameZH:"卡其", hex:"#c8a96a"}
+    {nameZH:"金黄", nameJA:"ゴールドイエロー", nameEN:"Golden Yellow", hex:"#ffcc5a"},
+    {nameZH:"琥珀", nameJA:"アンバー", nameEN:"Amber", hex:"#ffb84a"},
+    {nameZH:"卡其", nameJA:"カーキ", nameEN:"Khaki", hex:"#c8a96a"}
   ],
   metal: [
-    {nameZH:"银灰", hex:"#c9c9c9"},
-    {nameZH:"珍珠白", hex:"#f2f2f2"},
-    {nameZH:"香槟", hex:"#e8d8b8"}
+    {nameZH:"银灰", nameJA:"シルバーグレー", nameEN:"Silver Gray", hex:"#c9c9c9"},
+    {nameZH:"珍珠白", nameJA:"パールホワイト", nameEN:"Pearl White", hex:"#f2f2f2"},
+    {nameZH:"香槟", nameJA:"シャンパン", nameEN:"Champagne", hex:"#e8d8b8"}
   ],
   water: [
-    {nameZH:"深蓝", hex:"#2a7bff"},
-    {nameZH:"青蓝", hex:"#2dd4bf"},
-    {nameZH:"靛蓝", hex:"#4f46e5"}
+    {nameZH:"深蓝", nameJA:"ネイビー", nameEN:"Deep Blue", hex:"#2a7bff"},
+    {nameZH:"青蓝", nameJA:"ターコイズ", nameEN:"Turquoise", hex:"#2dd4bf"},
+    {nameZH:"靛蓝", nameJA:"インディゴ", nameEN:"Indigo", hex:"#4f46e5"}
   ]
 };
 
@@ -872,6 +902,18 @@ function pickLuckyNumbers(rng){
     if(!arr.includes(n)) arr.push(n);
   }
   return arr;
+}
+
+function pickOneColor(palette, rng){
+  if(!palette || !palette.length) return null;
+  return palette[Math.floor(rng() * palette.length)];
+}
+
+function getColorNameByLang(c, lang){
+  if(!c) return "—";
+  if(lang === "ja") return c.nameJA || c.nameZH || "—";
+  if(lang === "en") return c.nameEN || c.nameZH || "—";
+  return c.nameZH || "—";
 }
 
 /* =========================
@@ -914,24 +956,10 @@ function setChips(palette){
   });
 }
 
-function labelLuckyColorText(lang, domEl, palette){
-  // Keep it simple & cute
-  if(lang === "ja"){
-    const map = {wood:"偏「木」補強",fire:"偏「火」強め",earth:"偏「土」補強",metal:"偏「金」補強",water:"偏「水」補強"};
-    return map[domEl] || "ラッキー";
-  }
-  if(lang === "en"){
-    const map = {wood:"Boost WOOD",fire:"Boost FIRE",earth:"Boost EARTH",metal:"Boost METAL",water:"Boost WATER"};
-    return map[domEl] || "Lucky";
-  }
-  const map = {wood:"偏「木」补强",fire:"偏「火」增强",earth:"偏「土」补强",metal:"偏「金」补强",water:"偏「水」补强"};
-  return map[domEl] || "幸运";
-}
-
 function generate(){
+  const lang = el("langSel").value || "zh";
   const d = el("birthDate").value;
   const t0 = el("birthTime").value || "09:00";
-  const lang = el("langSel").value || "zh";
 
   if(!d){
     // Give a default if empty
@@ -943,7 +971,9 @@ function generate(){
   }
 
   const dateStr = el("birthDate").value;
-  const seed = hashSeed(`LUCK2026|${dateStr}|${t0}|${lang}`);
+
+  // FIX: seed should NOT depend on language (results stable across language switch)
+  const seed = hashSeed(`LUCK2026|${dateStr}|${t0}`);
   const rng = makeRng(seed);
 
   // Five elements
@@ -962,20 +992,23 @@ function generate(){
   el("nMetal").textContent = five.metal;
   el("nWater").textContent = five.water;
 
-  // Lucky colors
+  // Lucky colors: show a direct color name (localized) + chips palette
   const dom = dominantElement(five);
   const pal = COLOR_PALETTES[dom] || COLOR_PALETTES.earth;
   setChips(pal);
-  el("luckyColorV").textContent = labelLuckyColorText(lang, dom, pal);
+
+  const picked = pickOneColor(pal, rng);
+  el("luckyColorV").textContent = getColorNameByLang(picked, lang);
 
   // Lucky numbers
   const nums = pickLuckyNumbers(rng);
   el("luckyNumV").textContent = nums.join("/");
 
-  // Wealth direction (expanded)
+  // Wealth direction (expanded) with localized sub-label
   const dirCN = DIR_POOL[Math.floor(rng()*DIR_POOL.length)];
-  el("dirV").textContent = dirToAbbr(dirCN);   // big pixel
-  el("dirSub").textContent = (lang==="en") ? dirCN : dirCN; // keep CN text; simple & clear
+  const abbr = dirToAbbr(dirCN);
+  el("dirV").textContent = abbr;                 // big pixel
+  el("dirSub").textContent = dirLabel(dirCN, lang); // localized
 
   fitDirText();
 }
@@ -1009,7 +1042,9 @@ el("langSel").addEventListener("change", ()=>{
   const v = el("langSel").value;
   localStorage.setItem("luck2026_lang", v);
   applyLang(v);
-  // Keep generated content as-is; just refit text
+
+  // FIX: re-render in the selected language
+  generate();
   fitDirText();
 });
 
