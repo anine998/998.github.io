@@ -5,27 +5,28 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>2026 新年运势生成器</title>
 
-  <!-- 像素字体（可选：不影响功能；如果加载慢会自动回退系统字体） -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-  <!-- 八字/五行库 -->
   <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.js"></script>
 
   <style>
     :root{
-      --bg:#090a10;
-      --panel:#0f1422;
-      --panel2:#0b1020;
-      --ink:#e9eefc;
-      --muted:#a9b2d6;
-      --line:rgba(233,238,252,.16);
+      /* 新年红基调 */
+      --bg0:#120306;
+      --bg1:#23040a;
+      --bg2:#07010a;
+
+      --panel:rgba(16,10,18,.88);
+      --ink:#fff6ef;
+      --muted:rgba(255,246,239,.72);
+      --line:rgba(255,246,239,.14);
+
       --gold:#ffd56a;
-      --red:#ff3b30;
-      --green:#34c759;
-      --blue:#0a84ff;
-      --purple:#bf5af2;
+      --red:#ff2d2d;
+      --deepred:#c60b1e;
+
       --shadow: 0 18px 60px rgba(0,0,0,.55);
       --px: 3px;
     }
@@ -34,21 +35,22 @@
     html,body{ height:100%; }
     body{
       margin:0;
-      background: radial-gradient(1000px 600px at 20% 10%, rgba(255,59,48,.18), transparent 55%),
-                  radial-gradient(900px 520px at 80% 15%, rgba(255,213,106,.18), transparent 55%),
-                  radial-gradient(900px 520px at 60% 90%, rgba(10,132,255,.12), transparent 55%),
-                  linear-gradient(180deg, #070810, #0a0b14 55%, #060710);
       color:var(--ink);
       font-family: system-ui,-apple-system,"PingFang SC","Hiragino Sans","Microsoft Yahei",sans-serif;
+      background:
+        radial-gradient(1000px 600px at 25% 10%, rgba(255,45,45,.22), transparent 55%),
+        radial-gradient(900px 520px at 80% 15%, rgba(255,213,106,.20), transparent 60%),
+        radial-gradient(900px 520px at 50% 95%, rgba(198,11,30,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 55%, var(--bg2));
       overflow-x:hidden;
     }
 
-    /* 像素风：边框与阴影 */
+    /* 像素面板 */
     .px-panel{
-      background: linear-gradient(180deg, rgba(15,20,34,.92), rgba(11,16,32,.92));
+      background: linear-gradient(180deg, rgba(18,10,18,.86), rgba(10,6,14,.86));
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
-      border-radius: 14px;
+      border-radius: 16px;
       position: relative;
       overflow: hidden;
     }
@@ -58,62 +60,148 @@
       background:
         linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,0) 35%),
         repeating-linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.05) 1px, transparent 1px, transparent 3px);
-      opacity:.25;
+      opacity:.22;
       pointer-events:none;
     }
 
-    .wrap{ max-width: 1080px; margin: 0 auto; padding: 20px 14px 70px; }
+    .wrap{ max-width: 1120px; margin: 0 auto; padding: 20px 14px 70px; }
 
-    header{ display:flex; gap:12px; align-items:flex-start; justify-content:space-between; }
-    .titleBlock{ padding:16px 16px 12px; flex:1; min-width: 260px; }
+    header{ display:grid; grid-template-columns: 1fr 240px; gap:12px; align-items:stretch; }
+    @media (max-width: 920px){
+      header{ grid-template-columns: 1fr; }
+    }
+
+    .hero{ padding:16px; display:flex; gap:14px; align-items:stretch; }
+    @media (max-width: 920px){
+      .hero{ flex-direction:column; }
+    }
+
+    .heroLeft{ flex:1; min-width:260px; }
     .kicker{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
     .badge{
       display:inline-flex; align-items:center; justify-content:center;
       padding:6px 10px;
       border:1px solid rgba(255,213,106,.35);
-      background: rgba(255,213,106,.14);
-      color: var(--ink);
+      background: rgba(255,213,106,.12);
       border-radius: 999px;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.5px;
       font-size:12px;
+      color:var(--ink);
     }
-    h1{
-      margin:0 0 8px;
-      font-size: 22px;
-      line-height:1.25;
-      font-family: "Press Start 2P", system-ui, sans-serif;
-      letter-spacing: .5px;
+    .badge.pixel{
+      border-color:rgba(255,246,239,.22);
+      background:rgba(255,246,239,.08);
     }
-    .sub{ margin:0; color: var(--muted); font-size: 13px; line-height:1.6; }
 
-    .langBox{
-      width: 210px;
-      padding:16px;
+    /* 放大 2026 */
+    .bigYear{
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      font-size: 44px;
+      line-height:1;
+      letter-spacing: 2px;
+      margin: 6px 0 6px;
+      color: var(--gold);
+      text-shadow: 0 0 18px rgba(255,213,106,.18);
     }
+    .title{
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      margin: 0 0 8px;
+      font-size: 16px;
+      letter-spacing:.6px;
+    }
+    .sub{ margin:0; color: var(--muted); font-size: 13px; line-height:1.7; }
+
+    /* 像素红包 */
+    .envelopeWrap{
+      width: 260px;
+      flex: 0 0 260px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .envelope{
+      width: 240px;
+      height: 170px;
+      position: relative;
+      border-radius: 14px;
+      border: 1px solid rgba(255,246,239,.18);
+      background:
+        radial-gradient(120px 80px at 30% 20%, rgba(255,213,106,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,45,45,.92), rgba(198,11,30,.92));
+      box-shadow: 0 20px 70px rgba(0,0,0,.45);
+      overflow:hidden;
+    }
+    /* 像素纹理 */
+    .envelope:before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0, rgba(0,0,0,.08) 2px, transparent 2px, transparent 6px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0, rgba(255,255,255,.06) 1px, transparent 1px, transparent 4px);
+      opacity:.25;
+      pointer-events:none;
+    }
+    /* 信封翻盖（三角） */
+    .flap{
+      position:absolute;
+      left:0; top:0; right:0;
+      height: 92px;
+      background: linear-gradient(180deg, rgba(255,213,106,.10), rgba(0,0,0,0));
+      clip-path: polygon(0 0, 100% 0, 50% 88%);
+      border-bottom: 1px solid rgba(255,246,239,.12);
+    }
+    /* 金色封印 */
+    .seal{
+      position:absolute;
+      left:50%; top:66px;
+      width: 54px; height: 54px;
+      transform: translateX(-50%);
+      border-radius: 14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.30), rgba(255,255,255,0) 45%),
+                  linear-gradient(180deg, rgba(255,213,106,.95), rgba(212,175,55,.92));
+      border: 1px solid rgba(0,0,0,.18);
+      box-shadow: 0 10px 30px rgba(0,0,0,.30);
+      display:flex; align-items:center; justify-content:center;
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      font-size: 14px;
+      color:#3a1600;
+    }
+    .luck{
+      position:absolute;
+      left:0; right:0;
+      bottom:16px;
+      text-align:center;
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      letter-spacing: .8px;
+      color: rgba(255,246,239,.95);
+      text-shadow: 0 0 18px rgba(0,0,0,.25);
+      font-size: 14px;
+    }
+    .luck small{
+      display:block;
+      margin-top: 10px;
+      color: rgba(255,213,106,.95);
+      font-size: 16px;
+      letter-spacing: 2px;
+    }
+
+    /* 语言区 */
+    .langBox{ padding:16px; }
     .langRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
     select{
-      width: 110px;
+      width: 120px;
       padding:10px 10px;
       border-radius: 10px;
-      border:1px solid rgba(233,238,252,.18);
+      border:1px solid rgba(255,246,239,.18);
       background: rgba(0,0,0,.25);
       color: var(--ink);
       outline:none;
-      font-weight:600;
+      font-weight:700;
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    @media (max-width: 920px){
-      header{ flex-direction:column; }
-      .langBox{ width:100%; }
-      .grid{ grid-template-columns: 1fr; }
-    }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    @media (max-width: 920px){ .grid{ grid-template-columns: 1fr; } }
 
     .card{ padding:16px; }
     .card h2{
@@ -127,55 +215,45 @@
       width:100%;
       padding:11px 12px;
       border-radius: 12px;
-      border:1px solid rgba(233,238,252,.18);
+      border:1px solid rgba(255,246,239,.18);
       background: rgba(0,0,0,.25);
       color: var(--ink);
       outline:none;
     }
-    input:focus{ border-color: rgba(255,213,106,.45); }
+    input:focus{ border-color: rgba(255,213,106,.55); }
 
     .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
     button{
       padding:10px 12px;
       border-radius: 12px;
-      border:1px solid rgba(233,238,252,.18);
-      background: rgba(233,238,252,.10);
+      border:1px solid rgba(255,246,239,.18);
+      background: rgba(255,246,239,.10);
       color: var(--ink);
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
     }
     button.primary{
       border-color: rgba(255,213,106,.55);
-      background: linear-gradient(180deg, rgba(255,213,106,.24), rgba(255,59,48,.12));
+      background: linear-gradient(180deg, rgba(255,213,106,.22), rgba(255,45,45,.10));
     }
-    button:hover{ background: rgba(233,238,252,.14); }
+    button:hover{ background: rgba(255,246,239,.14); }
 
     .hint{ margin-top:10px; color: var(--muted); font-size: 12px; line-height:1.6; }
 
-    /* 输出区 */
-    .outBlock{
-      display:grid;
-      gap:12px;
-    }
-    .kv{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width:560px){
-      .kv{ grid-template-columns:1fr; }
-    }
+    /* 输出 */
+    .outBlock{ display:grid; gap:12px; }
+    .kv{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    @media (max-width:560px){ .kv{ grid-template-columns:1fr; } }
     .mini{
       padding:12px;
       border-radius: 12px;
-      border:1px solid rgba(233,238,252,.16);
+      border:1px solid rgba(255,246,239,.16);
       background: rgba(0,0,0,.20);
     }
     .mini .k{ color: var(--muted); font-size: 12px; }
-    .mini .v{ margin-top:6px; font-size: 16px; font-weight:800; }
+    .mini .v{ margin-top:6px; font-size: 16px; font-weight:900; color: var(--ink); }
 
-    /* 五行柱状图 */
-    .bars{ display:grid; gap:10px; }
+    .bars{ display:grid; gap:10px; margin-top:10px; }
     .barRow{
       display:grid;
       grid-template-columns: 54px 1fr 36px;
@@ -187,20 +265,18 @@
     .track{
       height: 12px;
       border-radius: 999px;
-      border:1px solid rgba(233,238,252,.16);
+      border:1px solid rgba(255,246,239,.16);
       background: rgba(0,0,0,.20);
       overflow:hidden;
     }
     .fill{ height:100%; width:0%; }
+
     .swatches{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    .swatch{ width:18px; height:18px; border-radius:6px; border:1px solid rgba(233,238,252,.18); }
+    .swatch{ width:18px; height:18px; border-radius:6px; border:1px solid rgba(255,246,239,.18); }
 
-    /* 像素彩纸 canvas */
-    canvas#pix{ position:fixed; inset:0; pointer-events:none; opacity:.55; }
+    canvas#pix{ position:fixed; inset:0; pointer-events:none; opacity:.58; }
 
-    /* 小脚注 */
     .foot{ margin-top:12px; color: var(--muted); font-size: 12px; line-height:1.7; }
-    a{ color: var(--gold); }
   </style>
 </head>
 
@@ -209,18 +285,32 @@
 
 <div class="wrap">
   <header>
-    <div class="px-panel titleBlock">
-      <div class="kicker">
-        <span class="badge" id="badgeYear">2026</span>
-        <span class="badge" style="border-color:rgba(10,132,255,.35);background:rgba(10,132,255,.12)" id="badgePixel">PIXEL</span>
+    <div class="px-panel hero">
+      <div class="heroLeft">
+        <div class="kicker">
+          <span class="badge" id="badgeYear">2026</span>
+          <span class="badge pixel" id="badgePixel">PIXEL</span>
+        </div>
+        <div class="bigYear" id="bigYear">2026</div>
+        <div class="title" id="tTitle">新年运势生成器</div>
+        <p class="sub" id="tSub">输入出生日期与时间，一键生成：八字、五行、幸运色、财运方位（互动娱乐用途）。</p>
       </div>
-      <h1 id="tTitle">2026 新年运势生成器</h1>
-      <p class="sub" id="tSub">输入出生日期与时间，一键生成：八字、五行、幸运色、财运方位（互动娱乐用途）。</p>
+
+      <div class="envelopeWrap">
+        <div class="envelope" aria-label="Pixel Red Envelope">
+          <div class="flap"></div>
+          <div class="seal">福</div>
+          <div class="luck">
+            LUCK
+            <small>2026</small>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="px-panel langBox">
       <div class="langRow">
-        <div style="font-weight:800" id="tLang">语言</div>
+        <div style="font-weight:900" id="tLang">语言</div>
         <select id="lang">
           <option value="zh">中文</option>
           <option value="ja">日本語</option>
@@ -248,12 +338,10 @@
         <button id="btnMusic">播放音乐</button>
       </div>
 
-      <audio id="bgm" preload="metadata" loop>
-        <source src="./haoyunlai.mp3" type="audio/mpeg">
-      </audio>
+      <audio id="bgm" preload="none" loop></audio>
 
       <div class="hint" id="tMusicHint">
-        如果音乐失败，请先确认 mp3 可直接打开：/newyear2026/haoyunlai.mp3
+        若失败：请先确认 mp3 可直接打开：/newyear2026/haoyunlai.mp3
       </div>
     </section>
 
@@ -276,7 +364,7 @@
   // ----------------------------
   const I18N = {
     zh: {
-      title: "2026 新年运势生成器",
+      title: "新年运势生成器",
       sub: "输入出生日期与时间，一键生成：八字、五行、幸运色、财运方位（互动娱乐用途）。",
       lang: "语言",
       langHint: "语言会自动记住。音乐需点击按钮播放。",
@@ -286,13 +374,13 @@
       gen: "生成结果",
       musicPlay: "播放音乐",
       musicPause: "暂停音乐",
-      musicHint: "如果音乐失败，请先确认 mp3 可直接打开：/newyear2026/haoyunlai.mp3",
+      musicHint: "若失败：请先确认 mp3 可直接打开：/newyear2026/haoyunlai.mp3",
       result: "生成结果",
       placeholder: "请选择日期/时间，然后点“生成结果”。",
       foot: "说明：本页面为互动展示用途。请勿将结果用于现实决策。",
       errNeedDate: "请先选择出生日期。",
-      errBgm404: "音乐加载失败：找不到 haoyunlai.mp3（或 404）。请确认文件在 newyear2026 目录下。",
-      errBgmPolicy: "音乐播放被浏览器拦截：请再点一次“播放音乐”，或检查浏览器的自动播放限制。",
+      errAudio404: "音乐加载失败：找不到 haoyunlai.mp3。请确认它在 newyear2026 目录下，并能被直接打开。",
+      errAudioDecode: "音乐无法播放：可能是浏览器策略或音频编码问题。请先在新标签页打开 mp3，确认能播放后再回来点按钮。",
       errGen: "生成失败：",
       bazi: "八字",
       year: "年柱",
@@ -301,10 +389,10 @@
       time: "时柱",
       wuxingChart: "五行柱状图",
       luckyColor: "2026 幸运色（娱乐版）",
-      wealthDir: "发财运势方位（娱乐版：参考今日财神方位）"
+      wealthDir: "发财方位（东南西北）"
     },
     ja: {
-      title: "2026 新年運勢ジェネレーター",
+      title: "新年運勢ジェネレーター",
       sub: "生年月日と時間を入力すると、八字・五行・ラッキーカラー・財運方位を生成します（娯楽用途）。",
       lang: "言語",
       langHint: "言語は記憶されます。音楽はボタンで再生します。",
@@ -314,13 +402,13 @@
       gen: "生成",
       musicPlay: "音楽再生",
       musicPause: "一時停止",
-      musicHint: "再生できない場合：/newyear2026/haoyunlai.mp3 を直接開けるか確認してください。",
+      musicHint: "失敗時：/newyear2026/haoyunlai.mp3 を直接開けるか確認してください。",
       result: "結果",
       placeholder: "日付/時間を入れて「生成」を押してください。",
       foot: "注：本ページは娯楽目的です。現実の判断に使用しないでください。",
       errNeedDate: "先に日付を選択してください。",
-      errBgm404: "音楽の読み込みに失敗：haoyunlai.mp3 が見つからない（404）。newyear2026 にあるか確認してください。",
-      errBgmPolicy: "ブラウザにより再生がブロックされました。もう一度「音楽再生」を押してください。",
+      errAudio404: "音楽が見つかりません（haoyunlai.mp3）。newyear2026 にあるか、直接開けるか確認してください。",
+      errAudioDecode: "再生できません。ブラウザ制限または音声形式の可能性があります。まず mp3 を新規タブで再生できるか確認してください。",
       errGen: "生成失敗：",
       bazi: "八字",
       year: "年柱",
@@ -329,10 +417,10 @@
       time: "時柱",
       wuxingChart: "五行グラフ",
       luckyColor: "2026 ラッキーカラー（娯楽）",
-      wealthDir: "金運方位（娯楽：本日の財神方位）"
+      wealthDir: "金運方位（東西南北）"
     },
     en: {
-      title: "2026 Fortune Generator",
+      title: "New Year Fortune Generator",
       sub: "Enter your birth date/time to generate BaZi, Five Elements, lucky colors and wealth direction (for fun).",
       lang: "Language",
       langHint: "Language is saved. Music plays after clicking the button.",
@@ -342,13 +430,13 @@
       gen: "Generate",
       musicPlay: "Play music",
       musicPause: "Pause",
-      musicHint: "If music fails: open /newyear2026/haoyunlai.mp3 directly to verify it exists.",
+      musicHint: "If it fails: open /newyear2026/haoyunlai.mp3 directly to verify.",
       result: "Result",
       placeholder: "Pick date/time and click “Generate”.",
       foot: "Note: For entertainment only. Do not use for real-life decisions.",
       errNeedDate: "Please select a birth date first.",
-      errBgm404: "Music load failed: haoyunlai.mp3 not found (404). Make sure it’s in /newyear2026/.",
-      errBgmPolicy: "Playback was blocked by the browser. Click “Play music” again or check autoplay settings.",
+      errAudio404: "Music not found (haoyunlai.mp3). Make sure it exists under /newyear2026/ and can be opened directly.",
+      errAudioDecode: "Cannot play audio. It may be browser restriction or audio encoding. First try opening the mp3 in a new tab.",
       errGen: "Generation failed: ",
       bazi: "BaZi",
       year: "Year Pillar",
@@ -357,7 +445,7 @@
       time: "Hour Pillar",
       wuxingChart: "Five Elements chart",
       luckyColor: "2026 Lucky Colors (for fun)",
-      wealthDir: "Wealth Direction (for fun: today’s 财神方位)"
+      wealthDir: "Wealth direction (N/E/S/W)"
     }
   };
 
@@ -370,6 +458,8 @@
     const L = I18N[langSel.value] || I18N.zh;
     return L[key] ?? I18N.zh[key] ?? key;
   }
+
+  let hasOutput = false;
   function applyLang(){
     localStorage.setItem("ny_lang", langSel.value);
     el("tTitle").textContent = t("title");
@@ -384,38 +474,61 @@
     el("tMusicHint").textContent = t("musicHint");
     el("tResult").textContent = t("result");
     el("tFoot").textContent = t("foot");
-    if (!hasOutput) el("tPlaceholder").textContent = t("placeholder");
+    if(!hasOutput) el("tPlaceholder").textContent = t("placeholder");
   }
   langSel.addEventListener("change", applyLang);
 
   // ----------------------------
-  // 音乐播放：更准确的错误提示
+  // 音乐：Safari 更稳（点击后才设置 src + load + play）
   // ----------------------------
   const bgm = el("bgm");
   const btnMusic = el("btnMusic");
   let playing = false;
 
-  async function checkAudioReachable(){
-    // 用 HEAD/GET 测试是否 404
+  // 用绝对路径更稳，避免相对路径在某些情况下被解析到别处
+  const AUDIO_URL = new URL("./haoyunlai.mp3", window.location.href).toString();
+
+  function attachAudioOnce(){
+    if (bgm.dataset.bound === "1") return;
+    bgm.dataset.bound = "1";
+
+    bgm.addEventListener("error", () => {
+      alert(t("errAudio404"));
+    }, { once:false });
+  }
+
+  async function canFetchAudio(){
     try{
-      const res = await fetch("./haoyunlai.mp3", { method:"HEAD", cache:"no-store" });
-      if (!res.ok) return { ok:false, status:res.status };
-      return { ok:true, status:res.status };
-    }catch(e){
-      // 某些情况下 HEAD 会失败，退化为直接尝试播放
-      return { ok:true, status:0, warn:true };
+      const r = await fetch(AUDIO_URL, { method:"GET", cache:"no-store" });
+      // 只读取头部即可，避免下满文件
+      return r.ok;
+    }catch(_){
+      // fetch 在某些环境可能失败，但不代表音频不可用
+      return true;
     }
   }
 
   btnMusic.addEventListener("click", async () => {
+    attachAudioOnce();
+
     try{
       if(!playing){
-        const chk = await checkAudioReachable();
-        if(!chk.ok){
-          alert(t("errBgm404") + (chk.status ? ` (HTTP ${chk.status})` : ""));
+        // 先确认资源大概率存在（更友好）
+        const ok = await canFetchAudio();
+        if(!ok){
+          alert(t("errAudio404"));
           return;
         }
+
+        // 点击后才设 src
+        if (!bgm.src) bgm.src = AUDIO_URL;
+        bgm.load();
+
+        // Safari 偶发：先 muted 播放更容易通过，再解除
+        bgm.muted = true;
         await bgm.play();
+        bgm.muted = false;
+
         playing = true;
       }else{
         bgm.pause();
@@ -423,30 +536,29 @@
       }
       btnMusic.textContent = playing ? t("musicPause") : t("musicPlay");
     }catch(e){
-      // play() Promise reject：多数是浏览器策略或解码失败
-      alert(t("errBgmPolicy"));
+      // 可能是解码/策略限制
+      alert(t("errAudioDecode"));
     }
   });
 
   // ----------------------------
-  // 生成：八字/五行 + 柱状图
+  // 生成：八字/五行 + 柱状图 + 方位（东南西北）
   // ----------------------------
   const birthDate = el("birthDate");
   const birthTime = el("birthTime");
   const out = el("out");
-  let hasOutput = false;
 
   // 幸运色（补短板：娱乐）
   const colorMap = {
     "木": ["#34c759","#30d158","#0a84ff"],
-    "火": ["#ff3b30","#ff2d55","#ffd60a"],
+    "火": ["#ff2d2d","#ff6b6b","#ffd56a"],
     "土": ["#ffd56a","#c9a227","#a2845e"],
     "金": ["#e5e5ea","#c7c7cc","#d4af37"],
     "水": ["#0a84ff","#64d2ff","#111111"],
   };
   const barColor = {
     "木":"#34c759",
-    "火":"#ff3b30",
+    "火":"#ff2d2d",
     "土":"#ffd56a",
     "金":"#e5e5ea",
     "水":"#0a84ff",
@@ -462,16 +574,37 @@
   function swatches(colors){
     return `<div class="swatches">${colors.map(c=>`<span class="swatch" style="background:${c}"></span>`).join("")}</div>`;
   }
-  function safeCaiPosition(lunarObj){
-    try{
-      if(typeof lunarObj.getPositionCai === "function") return String(lunarObj.getPositionCai());
-    }catch(_){}
-    try{
-      const s = lunarObj.toFullString ? lunarObj.toFullString() : "";
-      const m = s.match(/财神方位\[(.*?)\]/);
-      return m ? m[1] : "—";
-    }catch(_){}
+
+  // 方位标准化：八卦 → 东南西北
+  function normalizeDir(raw){
+    const s = String(raw || "").trim();
+    const direct = ["东南","西南","东北","西北","东","西","南","北","中"];
+    for (const d of direct){
+      if (s.includes(d)) return d;
+    }
+    const map = {
+      "震":"东", "巽":"东南", "离":"南", "坤":"西南",
+      "兑":"西", "乾":"西北", "坎":"北", "艮":"东北",
+      "中":"中"
+    };
+    for (const k of Object.keys(map)){
+      if (s.includes(k)) return map[k];
+    }
     return "—";
+  }
+
+  function safeCaiPosition(){
+    try{
+      const today = Lunar.fromDate(new Date());
+      if(typeof today.getPositionCai === "function"){
+        return normalizeDir(today.getPositionCai());
+      }
+      const full = today.toFullString ? today.toFullString() : "";
+      const m = full.match(/财神方位\[(.*?)\]/);
+      return normalizeDir(m ? m[1] : "");
+    }catch(_){
+      return "—";
+    }
   }
 
   function renderBars(counts){
@@ -480,7 +613,7 @@
     return `
       <div class="mini">
         <div class="k">${t("wuxingChart")}</div>
-        <div class="bars" style="margin-top:10px">
+        <div class="bars">
           ${order.map(k=>{
             const w = Math.round((counts[k]/max)*100);
             return `
@@ -536,18 +669,18 @@
 
       const weakest = pickWeakest(counts);
       const colors = colorMap[weakest] || ["#ffffff"];
-      const cai = safeCaiPosition(Lunar.fromDate(new Date()));
+      const cai = safeCaiPosition();
 
       hasOutput = true;
       out.innerHTML = `
         <div class="kv">
           <div class="mini">
             <div class="k">${t("bazi")}</div>
-            <div class="v" style="font-size:14px; margin-top:10px; line-height:1.8">
-              ${t("year")}: <span style="color:var(--ink)">${yearP}</span><br/>
-              ${t("month")}: <span style="color:var(--ink)">${monthP}</span><br/>
-              ${t("day")}: <span style="color:var(--ink)">${dayP}</span><br/>
-              ${t("time")}: <span style="color:var(--ink)">${timeP}</span>
+            <div class="v" style="font-size:14px; margin-top:10px; line-height:1.9">
+              ${t("year")}: ${yearP}<br/>
+              ${t("month")}: ${monthP}<br/>
+              ${t("day")}: ${dayP}<br/>
+              ${t("time")}: ${timeP}
             </div>
           </div>
 
@@ -555,7 +688,7 @@
             <div class="k">${t("luckyColor")}（${weakest}）</div>
             ${swatches(colors)}
             <div class="k" style="margin-top:10px">${t("wealthDir")}</div>
-            <div class="v" style="font-size:14px; margin-top:8px">${cai}</div>
+            <div class="v" style="font-size:16px; margin-top:8px">${cai}</div>
           </div>
         </div>
 
@@ -567,7 +700,7 @@
   });
 
   // ----------------------------
-  // 像素彩纸背景（轻量）
+  // 彩纸/烟花落下（保留效果，配色偏新年）
   // ----------------------------
   const canvas = el("pix");
   const ctx = canvas.getContext("2d");
@@ -585,20 +718,20 @@
   function spawn(){
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const n = 18;
-    const colors = ["#ffd56a","#ff3b30","#34c759","#0a84ff","#bf5af2"];
+    const colors = ["#ffd56a","#ff2d2d","#c60b1e","#34c759","#0a84ff","#fff6ef"];
     for(let i=0;i<n;i++){
       pps.push({
         x: Math.random()*W,
         y: -10*dpr,
         s: (2 + Math.random()*4)*dpr,
-        vy: (0.6 + Math.random()*1.8)*dpr,
+        vy: (0.7 + Math.random()*2.0)*dpr,
         vx: (-0.4 + Math.random()*0.8)*dpr,
         c: colors[(Math.random()*colors.length)|0],
-        life: 240 + ((Math.random()*120)|0)
+        life: 240 + ((Math.random()*140)|0)
       });
     }
   }
-  setInterval(()=>{ if(document.visibilityState==="visible") spawn(); }, 1200);
+  setInterval(()=>{ if(document.visibilityState==="visible") spawn(); }, 1100);
 
   function tick(){
     ctx.clearRect(0,0,W,H);
@@ -609,7 +742,6 @@
       p.y += p.vy;
       p.life -= 1;
       ctx.fillStyle = p.c;
-      // 像素方块
       ctx.fillRect((p.x|0), (p.y|0), (p.s|0), (p.s|0));
       if(p.y > H + 20 || p.life <= 0) pps.splice(i,1);
     }
@@ -617,7 +749,7 @@
   }
   tick();
 
-  // init lang
+  // init
   applyLang();
 </script>
 </body>
