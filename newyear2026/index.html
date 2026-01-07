@@ -20,52 +20,23 @@
       --ink:#2b0b10;
       --muted:rgba(43,11,16,.70);
       --gold:#ffcc66;
-      --line:rgba(43,11,16,.18);
+      --line:rgba(255,247,242,.55);
       --shadow: 0 18px 60px rgba(0,0,0,.35);
     }
-
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
       background:
-        radial-gradient(800px 520px at 20% 10%, rgba(255,204,102,.20), transparent 60%),
-        radial-gradient(900px 520px at 80% 20%, rgba(255,45,45,.22), transparent 60%),
+        radial-gradient(900px 520px at 15% 12%, rgba(255,204,102,.16), transparent 60%),
+        radial-gradient(1100px 620px at 80% 22%, rgba(255,45,45,.20), transparent 62%),
         linear-gradient(180deg, #1a0408, #120206 60%, #0e0205);
       color: var(--paper);
       font-family: system-ui,-apple-system,"PingFang SC","Hiragino Sans","Microsoft Yahei",sans-serif;
       overflow-x:hidden;
     }
 
-    /* 像素边框（更像贺卡，不是玻璃拟态） */
-    .px-border{
-      position:relative;
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .px-border:before{
-      content:"";
-      position:absolute; inset:0;
-      border: 2px solid rgba(255,247,242,.55);
-      border-radius: 18px;
-      pointer-events:none;
-    }
-    .px-border:after{
-      content:"";
-      position:absolute; inset:0;
-      background: repeating-linear-gradient(
-        90deg,
-        rgba(255,255,255,.05) 0,
-        rgba(255,255,255,.05) 2px,
-        transparent 2px,
-        transparent 6px
-      );
-      opacity:.14;
-      pointer-events:none;
-    }
-
-    /* 背景彩纸/烟花像素点 */
+    /* 背景像素点落下 */
     canvas#pix{
       position:fixed; inset:0;
       pointer-events:none;
@@ -73,56 +44,66 @@
       z-index:0;
     }
 
+    /* 宽度自适应：随屏幕变宽，但留边距 */
     .wrap{
-      max-width: 1080px;
+      width: min(1600px, calc(100vw - 32px)); /* 大屏更宽 */
       margin: 0 auto;
-      padding: 18px 14px 70px;
+      padding: 18px 0 70px;
       position:relative;
       z-index:1;
     }
-
-    /* 巨大红包容器 */
-    .envelope{
-      background:
-        radial-gradient(600px 320px at 30% 20%, rgba(255,204,102,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,45,45,.92), rgba(198,11,30,.92));
-      border: 1px solid rgba(255,247,242,.20);
+    @media (max-width: 560px){
+      .wrap{ width: calc(100vw - 18px); }
     }
 
-    /* 信封折角（大三角） */
-    .envelope .flap{
+    /* 像素红包大卡 */
+    .envelope{
+      position:relative;
+      border-radius: 18px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      background:
+        radial-gradient(900px 520px at 30% 20%, rgba(255,204,102,.18), transparent 62%),
+        linear-gradient(180deg, rgba(255,45,45,.92), rgba(198,11,30,.92));
+      border: 2px solid rgba(255,247,242,.35);
+    }
+    /* 像素纹理 */
+    .envelope:before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0, rgba(255,255,255,.06) 2px, transparent 2px, transparent 6px),
+        repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0, rgba(0,0,0,.05) 1px, transparent 1px, transparent 5px);
+      opacity:.18;
+      pointer-events:none;
+    }
+    /* 大信封折角 */
+    .flap{
       position:absolute;
       inset:0;
-      background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,0) 55%);
-      clip-path: polygon(0 0, 100% 0, 50% 44%);
+      background: linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,0) 58%);
+      clip-path: polygon(0 0, 100% 0, 50% 42%);
       opacity:.55;
       pointer-events:none;
     }
 
-    /* 顶部标题区：像素贺卡 */
-    .hero{
-      position:relative;
-      padding: 22px 22px 14px;
+    /* 顶部栏：左标题 + 右语言 */
+    .topbar{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:18px;
-      min-height: 210px;
+      gap: 12px;
+      padding: 18px 18px 8px;
+      position:relative;
+      z-index:1;
     }
-    @media (max-width: 920px){
-      .hero{ flex-direction:column; }
-    }
-
-    .heroLeft{
-      flex:1;
-      min-width: 260px;
+    @media (max-width: 720px){
+      .topbar{ flex-direction:column; align-items:stretch; }
     }
 
-    .logoRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-bottom: 12px;
+    .metaRow{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      margin-bottom: 10px;
     }
     .pill{
       display:inline-flex;
@@ -132,87 +113,83 @@
       border-radius: 999px;
       border: 1px solid rgba(255,247,242,.34);
       background: rgba(0,0,0,.14);
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing:.4px;
       font-size: 12px;
     }
+    .pill.gold{
+      border-color: rgba(255,204,102,.48);
+      color: rgba(255,247,242,.95);
+    }
 
-    .big2026{
+    /* 头图：LUCK 2026 */
+    .hero{
+      padding: 0 18px 10px;
+      position:relative;
+      z-index:1;
+    }
+    .heroBanner{
+      border-radius: 16px;
+      border: 1px solid rgba(255,247,242,.25);
+      background:
+        radial-gradient(380px 220px at 18% 40%, rgba(255,204,102,.18), transparent 62%),
+        radial-gradient(420px 240px at 82% 30%, rgba(255,255,255,.10), transparent 70%),
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,0));
+      padding: 16px 16px 18px;
+      overflow:hidden;
+      position:relative;
+    }
+    .heroBanner:before{
+      content:"";
+      position:absolute; inset:0;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0, rgba(255,255,255,.05) 1px, transparent 1px, transparent 4px);
+      opacity:.16;
+      pointer-events:none;
+    }
+    .heroTitle{
       font-family: "Press Start 2P", system-ui, sans-serif;
-      font-size: 54px;
+      font-size: clamp(40px, 6.6vw, 76px);
       letter-spacing: 2px;
       line-height:1.05;
-      margin: 6px 0 10px;
+      margin: 0;
       color: var(--gold);
       text-shadow: 0 0 26px rgba(255,204,102,.20);
     }
-    .subtitle{
-      margin:0;
+    .heroSub{
+      margin: 10px 0 0;
       font-size: 13px;
-      color: rgba(255,247,242,.86);
+      color: rgba(255,247,242,.90);
       line-height:1.7;
     }
 
-    /* 红包正面像素牌（LUCK 2026） */
-    .frontCard{
-      width: 300px;
-      flex: 0 0 300px;
-      align-self:stretch;
+    /* 语言选择 */
+    .langBox{
       display:flex;
+      gap:10px;
       align-items:center;
-      justify-content:center;
+      justify-content:flex-end;
+      padding-top: 2px;
     }
-    .pixelCard{
-      width: 280px;
-      height: 170px;
-      border-radius: 18px;
-      position:relative;
-      background:
-        radial-gradient(140px 90px at 30% 20%, rgba(255,204,102,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,70,70,.9), rgba(160,8,24,.92));
-      border: 1px solid rgba(255,247,242,.22);
-      box-shadow: 0 22px 70px rgba(0,0,0,.25);
-      overflow:hidden;
+    .langLabel{
+      font-weight: 900;
+      font-size: 12px;
+      color: rgba(255,247,242,.86);
+      opacity:.92;
     }
-    .pixelCard:before{
-      content:"";
-      position:absolute; inset:0;
-      background: repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0, rgba(255,255,255,.06) 1px, transparent 1px, transparent 4px);
-      opacity:.18;
-      pointer-events:none;
+    select{
+      width: 140px;
+      padding:10px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(255,247,242,.22);
+      background: rgba(0,0,0,.18);
+      color: var(--paper);
+      outline:none;
+      font-weight:900;
     }
-    .seal{
-      position:absolute;
-      top: 52px; left:50%;
-      transform:translateX(-50%);
-      width: 54px; height: 54px;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,204,102,.98), rgba(212,175,55,.92));
-      border: 1px solid rgba(0,0,0,.18);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family: "Press Start 2P", system-ui, sans-serif;
-      color:#3a1600;
-      font-size: 14px;
-      box-shadow: 0 14px 34px rgba(0,0,0,.22);
-    }
-    .luckText{
-      position:absolute;
-      left:0; right:0;
-      bottom: 18px;
-      text-align:center;
-      font-family: "Press Start 2P", system-ui, sans-serif;
-      letter-spacing: 1px;
-      color: rgba(255,247,242,.92);
-      text-shadow: 0 0 20px rgba(0,0,0,.22);
-    }
-    .luckText .top{ font-size: 14px; opacity:.92; }
-    .luckText .btm{ margin-top: 10px; font-size: 18px; color: var(--gold); letter-spacing: 2px; }
 
     /* 白色“贺卡内容区” */
     .paper{
-      margin: 0 22px 22px;
+      margin: 12px 18px 18px;
       background: linear-gradient(180deg, rgba(255,247,242,.96), rgba(255,247,242,.92));
       border-radius: 16px;
       border: 1px solid rgba(0,0,0,.10);
@@ -220,6 +197,7 @@
       color: var(--ink);
       position:relative;
       box-shadow: 0 16px 45px rgba(0,0,0,.22);
+      z-index:1;
     }
     .paper:before{
       content:"";
@@ -238,22 +216,22 @@
       position:relative;
       z-index:1;
     }
-    .field{ min-width: 220px; flex:1; }
+    .field{ min-width: 240px; flex:1; }
     label{
       display:block;
       font-size: 12px;
-      color: var(--muted);
+      color: rgba(43,11,16,.72);
       margin-bottom:6px;
-      font-weight:700;
+      font-weight:900;
     }
     input{
       width:100%;
       padding: 10px 12px;
       border-radius: 12px;
       border: 1px solid rgba(43,11,16,.18);
-      background: rgba(255,255,255,.55);
+      background: rgba(255,255,255,.62);
       outline:none;
-      font-weight:700;
+      font-weight:800;
       color: var(--ink);
     }
     input:focus{ border-color: rgba(198,11,30,.45); }
@@ -263,418 +241,8 @@
       padding: 10px 12px;
       border-radius: 12px;
       border: 1px solid rgba(43,11,16,.18);
-      background: rgba(255,255,255,.62);
+      background: rgba(255,255,255,.70);
       color: var(--ink);
       cursor:pointer;
-      font-weight:900;
+      font-weight:1000;
     }
-    button.primary{
-      background: linear-gradient(180deg, rgba(255,204,102,.50), rgba(255,255,255,.55));
-      border-color: rgba(198,11,30,.25);
-    }
-    button:hover{ filter: brightness(1.02); }
-
-    .hint{
-      margin-top: 10px;
-      font-size: 12px;
-      color: rgba(43,11,16,.65);
-      line-height:1.6;
-      position:relative;
-      z-index:1;
-    }
-
-    /* 结果区（像素小卡片） */
-    .resultGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 14px;
-      position:relative;
-      z-index:1;
-    }
-    @media (max-width: 860px){
-      .resultGrid{ grid-template-columns:1fr; }
-    }
-
-    .mini{
-      border-radius: 14px;
-      border: 1px solid rgba(43,11,16,.16);
-      background: rgba(255,255,255,.62);
-      padding: 12px;
-    }
-    .mini .k{
-      font-size: 12px;
-      color: rgba(43,11,16,.68);
-      font-weight:900;
-      letter-spacing:.2px;
-    }
-    .mini .v{
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: 1000;
-      color: rgba(43,11,16,.92);
-    }
-
-    .swatches{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .swatch{
-      width: 22px;
-      height: 22px;
-      border-radius: 8px;
-      border: 1px solid rgba(43,11,16,.16);
-      box-shadow: 0 6px 18px rgba(0,0,0,.08);
-    }
-
-    /* 五行柱状图 */
-    .bars{ display:grid; gap:10px; margin-top: 10px; }
-    .barRow{
-      display:grid;
-      grid-template-columns: 54px 1fr 34px;
-      gap: 10px;
-      align-items:center;
-      font-size: 13px;
-      color: rgba(43,11,16,.72);
-      font-weight:800;
-    }
-    .track{
-      height: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(43,11,16,.14);
-      background: rgba(0,0,0,.06);
-      overflow:hidden;
-    }
-    .fill{ height:100%; width:0%; }
-
-    .foot{
-      margin-top: 12px;
-      font-size: 12px;
-      color: rgba(43,11,16,.55);
-      line-height:1.7;
-      position:relative;
-      z-index:1;
-    }
-  </style>
-</head>
-
-<body>
-<canvas id="pix"></canvas>
-
-<div class="wrap">
-  <div class="px-border envelope" style="position:relative;">
-    <div class="flap"></div>
-
-    <div class="hero">
-      <div class="heroLeft">
-        <div class="logoRow">
-          <span class="pill">2026</span>
-          <span class="pill" style="border-color:rgba(255,204,102,.45);">PIXEL CARD</span>
-        </div>
-        <div class="big2026">2026</div>
-        <p class="subtitle">像素新年贺卡：一键生成幸运色、幸运数字、发财方位与五行分布（互动娱乐用途）。</p>
-      </div>
-
-      <div class="frontCard">
-        <div class="pixelCard" aria-label="Red envelope card">
-          <div class="seal">福</div>
-          <div class="luckText">
-            <div class="top">LUCK</div>
-            <div class="btm">2026</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="paper">
-      <div class="controls">
-        <div class="field">
-          <label>出生日期</label>
-          <input id="birthDate" type="date" />
-        </div>
-        <div class="field">
-          <label>出生时间</label>
-          <input id="birthTime" type="time" value="09:00" />
-        </div>
-
-        <div class="btnRow">
-          <button class="primary" id="btnGen">生成</button>
-          <button id="btnMusic">播放音乐</button>
-        </div>
-      </div>
-
-      <audio id="bgm" preload="none" loop></audio>
-
-      <div class="hint" id="musicHint">
-        音乐文件需位于：newyear2026/haoyunlai.mp3（代码已自动适配“有无结尾斜杠”的路径差异）。
-      </div>
-
-      <div class="resultGrid" id="out">
-        <div class="mini">
-          <div class="k">幸运色</div>
-          <div class="v">—</div>
-          <div class="swatches"></div>
-        </div>
-
-        <div class="mini">
-          <div class="k">幸运数字</div>
-          <div class="v">—</div>
-        </div>
-
-        <div class="mini">
-          <div class="k">发财方位（东南西北）</div>
-          <div class="v">—</div>
-        </div>
-
-        <div class="mini">
-          <div class="k">五行分布</div>
-          <div class="bars"></div>
-        </div>
-      </div>
-
-      <div class="foot">
-        注：本页面为互动展示用途，请勿将结果用于现实决策。
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  const el = (id)=>document.getElementById(id);
-
-  // ----------------------------
-  // 关键修复：无论你访问 /newyear2026 还是 /newyear2026/ 都能正确拼出 mp3 绝对路径
-  // ----------------------------
-  function baseDir(){
-    const o = window.location.origin;
-    const p = window.location.pathname;
-    // 1) /xxx/index.html 形式
-    if (p.endsWith(".html")) return o + p.slice(0, p.lastIndexOf("/") + 1);
-    // 2) /newyear2026/ 形式
-    if (p.endsWith("/")) return o + p;
-    // 3) /newyear2026 形式（没有斜杠）——这就是你现在的坑
-    return o + p + "/";
-  }
-  const AUDIO_URL = baseDir() + "haoyunlai.mp3";
-
-  // ----------------------------
-  // 音乐播放（Safari 兼容）：点击后才设置 src + load + play；先静音再解除
-  // ----------------------------
-  const bgm = el("bgm");
-  const btnMusic = el("btnMusic");
-  let playing = false;
-
-  bgm.addEventListener("error", ()=>{
-    alert("音乐加载失败：找不到 haoyunlai.mp3。\n我尝试打开的地址是：\n" + AUDIO_URL + "\n\n请把这个地址复制到新标签页看看是否 404。");
-  });
-
-  btnMusic.addEventListener("click", async ()=>{
-    try{
-      if(!playing){
-        if(!bgm.src) bgm.src = AUDIO_URL;
-        bgm.load();
-        bgm.muted = true;
-        await bgm.play();
-        bgm.muted = false;
-        playing = true;
-        btnMusic.textContent = "暂停音乐";
-      }else{
-        bgm.pause();
-        playing = false;
-        btnMusic.textContent = "播放音乐";
-      }
-    }catch(e){
-      alert("音乐无法播放：可能是浏览器策略或音频编码问题。\n建议：先用新标签页直接打开 mp3 地址确认能播放。");
-    }
-  });
-
-  // ----------------------------
-  // 结果：幸运色 / 幸运数字 / 发财方位 / 五行分布
-  // ----------------------------
-  const colorMap = {
-    "木": ["#2ecc71","#34c759","#0a84ff"],
-    "火": ["#ff2d2d","#ff6b6b","#ffcc66"],
-    "土": ["#ffcc66","#c9a227","#a2845e"],
-    "金": ["#e5e5ea","#c7c7cc","#d4af37"],
-    "水": ["#0a84ff","#64d2ff","#111111"],
-  };
-  const barColor = {
-    "木":"#2ecc71",
-    "火":"#ff2d2d",
-    "土":"#ffcc66",
-    "金":"#b7b7b7",
-    "水":"#0a84ff",
-  };
-
-  function normalizeDir(raw){
-    const s = String(raw || "").trim();
-    const direct = ["东南","西南","东北","西北","东","西","南","北","中"];
-    for (const d of direct){
-      if (s.includes(d)) return d;
-    }
-    const map = {
-      "震":"东", "巽":"东南", "离":"南", "坤":"西南",
-      "兑":"西", "乾":"西北", "坎":"北", "艮":"东北", "中":"中"
-    };
-    for (const k of Object.keys(map)){
-      if (s.includes(k)) return map[k];
-    }
-    return "—";
-  }
-
-  function wealthDirToday(){
-    try{
-      const today = Lunar.fromDate(new Date());
-      if(typeof today.getPositionCai === "function"){
-        return normalizeDir(today.getPositionCai());
-      }
-      const full = today.toFullString ? today.toFullString() : "";
-      const m = full.match(/财神方位\[(.*?)\]/);
-      return normalizeDir(m ? m[1] : "");
-    }catch(_){
-      return "—";
-    }
-  }
-
-  function pickWeakest(counts){
-    let kMin="木", min=1e9;
-    for(const k of Object.keys(counts)){
-      if(counts[k] < min){ min = counts[k]; kMin = k; }
-    }
-    return kMin;
-  }
-
-  function luckyNumbersFrom(dateStr,timeStr){
-    // 稳定可复现：把数字全部相加，做两次折叠，给 3 个“看起来像贺卡”的数字
-    const s = (dateStr + timeStr).replace(/[^0-9]/g,"");
-    let sum = 0;
-    for(const ch of s) sum += (ch.charCodeAt(0)-48);
-    const a = (sum % 9) + 1;
-    const b = ((sum * 7) % 9) + 1;
-    const c = ((sum * 13) % 9) + 1;
-    // 去重保持 3 个
-    const arr = [];
-    for(const n of [a,b,c,8,6,9]){
-      if(arr.length<3 && !arr.includes(n)) arr.push(n);
-    }
-    return arr.join(" / ");
-  }
-
-  function renderBars(container, counts){
-    const max = Math.max(...Object.values(counts), 1);
-    const order = ["木","火","土","金","水"];
-    container.innerHTML = order.map(k=>{
-      const w = Math.round((counts[k]/max)*100);
-      return `
-        <div class="barRow">
-          <div>${k}</div>
-          <div class="track"><div class="fill" style="width:${w}%;background:${barColor[k]}"></div></div>
-          <div style="text-align:right">${counts[k]}</div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  el("btnGen").addEventListener("click", ()=>{
-    const d = el("birthDate").value;
-    const t = el("birthTime").value || "09:00";
-    if(!d){ alert("请先选择出生日期。"); return; }
-
-    const [y,m,day] = d.split("-").map(n=>parseInt(n,10));
-    const [hh,mm] = t.split(":").map(n=>parseInt(n,10));
-
-    try{
-      const solar = Solar.fromYmdHms(y,m,day,hh,mm,0);
-      const lunarObj = solar.getLunar();
-
-      // 只用五行（不展示八字）
-      let wxStr = "";
-      const ec = lunarObj.getEightChar ? lunarObj.getEightChar() : null;
-      if(ec){
-        if(ec.getYearWuXing) wxStr += String(ec.getYearWuXing());
-        if(ec.getMonthWuXing) wxStr += String(ec.getMonthWuXing());
-        if(ec.getDayWuXing) wxStr += String(ec.getDayWuXing());
-        if(ec.getTimeWuXing) wxStr += String(ec.getTimeWuXing());
-      }
-
-      const counts = {"木":0,"火":0,"土":0,"金":0,"水":0};
-      for(const k of Object.keys(counts)){
-        counts[k] = (wxStr.match(new RegExp(k,"g")) || []).length;
-      }
-
-      const weakest = pickWeakest(counts);
-      const colors = colorMap[weakest] || ["#ffffff"];
-      const nums = luckyNumbersFrom(d,t);
-      const dir = wealthDirToday();
-
-      const out = el("out");
-      const cards = out.querySelectorAll(".mini");
-
-      // 0: 幸运色
-      cards[0].querySelector(".v").textContent = `偏「${weakest}」补强`;
-      const sw = cards[0].querySelector(".swatches");
-      sw.innerHTML = colors.map(c=>`<span class="swatch" style="background:${c}"></span>`).join("");
-
-      // 1: 幸运数字
-      cards[1].querySelector(".v").textContent = nums;
-
-      // 2: 发财方位
-      cards[2].querySelector(".v").textContent = dir;
-
-      // 3: 五行分布
-      renderBars(cards[3].querySelector(".bars"), counts);
-
-    }catch(err){
-      alert("生成失败：" + String(err));
-    }
-  });
-
-  // ----------------------------
-  // 彩纸/烟花像素点落下（保留效果，配色偏新年）
-  // ----------------------------
-  const canvas = el("pix");
-  const ctx = canvas.getContext("2d");
-  let W=0,H=0,pps=[];
-  function resize(){
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    W = canvas.width = Math.floor(window.innerWidth * dpr);
-    H = canvas.height = Math.floor(window.innerHeight * dpr);
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
-  }
-  window.addEventListener("resize", resize);
-  resize();
-
-  function spawn(){
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const n = 20;
-    const colors = ["#ffcc66","#ff2d2d","#c60b1e","#ffffff","#34c759","#0a84ff"];
-    for(let i=0;i<n;i++){
-      pps.push({
-        x: Math.random()*W,
-        y: -10*dpr,
-        s: (2 + Math.random()*4)*dpr,
-        vy: (0.8 + Math.random()*2.0)*dpr,
-        vx: (-0.5 + Math.random()*1.0)*dpr,
-        c: colors[(Math.random()*colors.length)|0],
-        life: 260 + ((Math.random()*160)|0)
-      });
-    }
-  }
-  setInterval(()=>{ if(document.visibilityState==="visible") spawn(); }, 950);
-
-  function tick(){
-    ctx.clearRect(0,0,W,H);
-    ctx.globalAlpha = 0.9;
-    for(let i=pps.length-1;i>=0;i--){
-      const p = pps[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= 1;
-      ctx.fillStyle = p.c;
-      ctx.fillRect((p.x|0), (p.y|0), (p.s|0), (p.s|0));
-      if(p.y > H + 30 || p.life <= 0) pps.splice(i,1);
-    }
-    requestAnimationFrame(tick);
-  }
-  tick();
-</script>
-</body>
-</html>
