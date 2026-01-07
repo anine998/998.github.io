@@ -246,3 +246,442 @@
       cursor:pointer;
       font-weight:1000;
     }
+    button.primary{
+      background: linear-gradient(180deg, rgba(255,204,102,.55), rgba(255,255,255,.65));
+      border-color: rgba(198,11,30,.25);
+    }
+
+    .hint{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(43,11,16,.62);
+      line-height:1.6;
+      position:relative;
+      z-index:1;
+    }
+
+    .resultGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+      position:relative;
+      z-index:1;
+    }
+    @media (max-width: 860px){
+      .resultGrid{ grid-template-columns:1fr; }
+    }
+
+    .mini{
+      border-radius: 14px;
+      border: 1px solid rgba(43,11,16,.16);
+      background: rgba(255,255,255,.70);
+      padding: 12px;
+    }
+    .mini .k{
+      font-size: 12px;
+      color: rgba(43,11,16,.66);
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+    .mini .v{
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 1000;
+      color: rgba(43,11,16,.92);
+    }
+
+    .swatches{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .swatch{
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      border: 1px solid rgba(43,11,16,.16);
+      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    }
+
+    .bars{ display:grid; gap:10px; margin-top: 10px; }
+    .barRow{
+      display:grid;
+      grid-template-columns: 54px 1fr 34px;
+      gap: 10px;
+      align-items:center;
+      font-size: 13px;
+      color: rgba(43,11,16,.72);
+      font-weight:900;
+    }
+    .track{
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(43,11,16,.14);
+      background: rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .fill{ height:100%; width:0%; }
+
+    .foot{
+      margin-top: 12px;
+      font-size: 12px;
+      color: rgba(43,11,16,.52);
+      line-height:1.7;
+      position:relative;
+      z-index:1;
+    }
+  </style>
+</head>
+
+<body>
+<canvas id="pix"></canvas>
+
+<div class="wrap">
+  <div class="envelope">
+    <div class="flap"></div>
+
+    <div class="topbar">
+      <div>
+        <div class="metaRow">
+          <span class="pill">2026</span>
+          <span class="pill gold" id="tCard">PIXEL CARD</span>
+        </div>
+      </div>
+
+      <div class="langBox">
+        <div class="langLabel" id="tLang">语言</div>
+        <select id="lang">
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="heroBanner">
+        <h1 class="heroTitle">LUCK 2026</h1>
+        <p class="heroSub" id="tSub">
+          像素新年贺卡：一键生成幸运色、幸运数字、发财方位与五行分布（互动娱乐用途）。
+        </p>
+      </div>
+    </div>
+
+    <div class="paper">
+      <div class="controls">
+        <div class="field">
+          <label id="tDate">出生日期</label>
+          <input id="birthDate" type="date" />
+        </div>
+        <div class="field">
+          <label id="tTime">出生时间</label>
+          <input id="birthTime" type="time" value="09:00" />
+        </div>
+
+        <div class="btnRow">
+          <button class="primary" id="btnGen">生成</button>
+          <button id="btnMusic">播放音乐</button>
+        </div>
+      </div>
+
+      <audio id="bgm" preload="none" loop></audio>
+
+      <div class="hint" id="tHint">
+        音乐稍后调整。当前文件位置：newyear2026/haoyunlai.mp3
+      </div>
+
+      <div class="resultGrid" id="out">
+        <div class="mini">
+          <div class="k" id="tColorK">幸运色</div>
+          <div class="v" id="colorV">—</div>
+          <div class="swatches" id="swatches"></div>
+        </div>
+
+        <div class="mini">
+          <div class="k" id="tNumK">幸运数字</div>
+          <div class="v" id="numV">—</div>
+        </div>
+
+        <div class="mini">
+          <div class="k" id="tDirK">发财方位（东南西北）</div>
+          <div class="v" id="dirV">—</div>
+        </div>
+
+        <div class="mini">
+          <div class="k" id="tWxK">五行分布</div>
+          <div class="bars" id="bars"></div>
+        </div>
+      </div>
+
+      <div class="foot" id="tFoot">
+        注：本页面为互动展示用途，请勿将结果用于现实决策。
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const el = (id)=>document.getElementById(id);
+
+  // ----------------------------
+  // 三语
+  // ----------------------------
+  const I18N = {
+    zh:{
+      card:"PIXEL CARD",
+      lang:"语言",
+      sub:"像素新年贺卡：一键生成幸运色、幸运数字、发财方位与五行分布（互动娱乐用途）。",
+      date:"出生日期",
+      time:"出生时间",
+      gen:"生成",
+      play:"播放音乐",
+      pause:"暂停音乐",
+      hint:"音乐稍后调整。当前文件位置：newyear2026/haoyunlai.mp3",
+      colorK:"幸运色",
+      numK:"幸运数字",
+      dirK:"发财方位（东南西北）",
+      wxK:"五行分布",
+      foot:"注：本页面为互动展示用途，请勿将结果用于现实决策。",
+      errNeed:"请先选择出生日期。"
+    },
+    ja:{
+      card:"PIXEL CARD",
+      lang:"言語",
+      sub:"ピクセル年賀カード：ラッキーカラー、ラッキーナンバー、金運方位、五行分布を生成（娯楽用途）。",
+      date:"生年月日",
+      time:"出生時間",
+      gen:"生成",
+      play:"音楽再生",
+      pause:"一時停止",
+      hint:"音楽は後で調整します。ファイル：newyear2026/haoyunlai.mp3",
+      colorK:"ラッキーカラー",
+      numK:"ラッキーナンバー",
+      dirK:"金運方位（東西南北）",
+      wxK:"五行分布",
+      foot:"注：娯楽目的です。現実の判断に使用しないでください。",
+      errNeed:"先に日付を選択してください。"
+    },
+    en:{
+      card:"PIXEL CARD",
+      lang:"Language",
+      sub:"Pixel New Year card: generate lucky colors, lucky numbers, wealth direction and Five-Elements distribution (for fun).",
+      date:"Birth date",
+      time:"Birth time",
+      gen:"Generate",
+      play:"Play music",
+      pause:"Pause",
+      hint:"We will fix music later. File: newyear2026/haoyunlai.mp3",
+      colorK:"Lucky colors",
+      numK:"Lucky numbers",
+      dirK:"Wealth direction (N/E/S/W)",
+      wxK:"Five Elements",
+      foot:"Note: For entertainment only. Do not use for real-life decisions.",
+      errNeed:"Please select a birth date first."
+    }
+  };
+
+  const langSel = el("lang");
+  langSel.value = localStorage.getItem("ny_lang") || "zh";
+
+  let playing = false;
+  function t(k){ return (I18N[langSel.value]||I18N.zh)[k] || I18N.zh[k] || k; }
+
+  function applyLang(){
+    localStorage.setItem("ny_lang", langSel.value);
+    el("tCard").textContent = t("card");
+    el("tLang").textContent = t("lang");
+    el("tSub").textContent = t("sub");
+    el("tDate").textContent = t("date");
+    el("tTime").textContent = t("time");
+    el("btnGen").textContent = t("gen");
+    el("btnMusic").textContent = playing ? t("pause") : t("play");
+    el("tHint").textContent = t("hint");
+    el("tColorK").textContent = t("colorK");
+    el("tNumK").textContent = t("numK");
+    el("tDirK").textContent = t("dirK");
+    el("tWxK").textContent = t("wxK");
+    el("tFoot").textContent = t("foot");
+  }
+  langSel.addEventListener("change", applyLang);
+
+  // ----------------------------
+  // 生成逻辑（保留）
+  // ----------------------------
+  const colorMap = {
+    "木": ["#2ecc71","#34c759","#0a84ff"],
+    "火": ["#ff2d2d","#ff6b6b","#ffcc66"],
+    "土": ["#ffcc66","#c9a227","#a2845e"],
+    "金": ["#e5e5ea","#c7c7cc","#d4af37"],
+    "水": ["#0a84ff","#64d2ff","#111111"],
+  };
+  const barColor = {
+    "木":"#2ecc71",
+    "火":"#ff2d2d",
+    "土":"#ffcc66",
+    "金":"#b7b7b7",
+    "水":"#0a84ff",
+  };
+
+  function normalizeDir(raw){
+    const s = String(raw || "").trim();
+    const direct = ["东南","西南","东北","西北","东","西","南","北","中"];
+    for (const d of direct){
+      if (s.includes(d)) return d;
+    }
+    const map = { "震":"东","巽":"东南","离":"南","坤":"西南","兑":"西","乾":"西北","坎":"北","艮":"东北","中":"中" };
+    for (const k of Object.keys(map)){
+      if (s.includes(k)) return map[k];
+    }
+    return "—";
+  }
+
+  function wealthDirToday(){
+    try{
+      const today = Lunar.fromDate(new Date());
+      if(typeof today.getPositionCai === "function") return normalizeDir(today.getPositionCai());
+      const full = today.toFullString ? today.toFullString() : "";
+      const m = full.match(/财神方位\[(.*?)\]/);
+      return normalizeDir(m ? m[1] : "");
+    }catch(_){ return "—"; }
+  }
+
+  function pickWeakest(counts){
+    let kMin="木", min=1e9;
+    for(const k of Object.keys(counts)){
+      if(counts[k] < min){ min = counts[k]; kMin = k; }
+    }
+    return kMin;
+  }
+
+  function luckyNumbersFrom(dateStr,timeStr){
+    const s = (dateStr + timeStr).replace(/[^0-9]/g,"");
+    let sum = 0;
+    for(const ch of s) sum += (ch.charCodeAt(0)-48);
+    const a = (sum % 9) + 1;
+    const b = ((sum * 7) % 9) + 1;
+    const c = ((sum * 13) % 9) + 1;
+    const arr = [];
+    for(const n of [a,b,c,8,6,9]){
+      if(arr.length<3 && !arr.includes(n)) arr.push(n);
+    }
+    return arr.join(" / ");
+  }
+
+  function renderBars(counts){
+    const max = Math.max(...Object.values(counts), 1);
+    const order = ["木","火","土","金","水"];
+    el("bars").innerHTML = order.map(k=>{
+      const w = Math.round((counts[k]/max)*100);
+      return `
+        <div class="barRow">
+          <div>${k}</div>
+          <div class="track"><div class="fill" style="width:${w}%;background:${barColor[k]}"></div></div>
+          <div style="text-align:right">${counts[k]}</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  el("btnGen").addEventListener("click", ()=>{
+    const d = el("birthDate").value;
+    const t0 = el("birthTime").value || "09:00";
+    if(!d){ alert(t("errNeed")); return; }
+
+    const [y,m,day] = d.split("-").map(n=>parseInt(n,10));
+    const [hh,mm] = t0.split(":").map(n=>parseInt(n,10));
+
+    try{
+      const solar = Solar.fromYmdHms(y,m,day,hh,mm,0);
+      const lunarObj = solar.getLunar();
+      let wxStr = "";
+      const ec = lunarObj.getEightChar ? lunarObj.getEightChar() : null;
+      if(ec){
+        if(ec.getYearWuXing) wxStr += String(ec.getYearWuXing());
+        if(ec.getMonthWuXing) wxStr += String(ec.getMonthWuXing());
+        if(ec.getDayWuXing) wxStr += String(ec.getDayWuXing());
+        if(ec.getTimeWuXing) wxStr += String(ec.getTimeWuXing());
+      }
+
+      const counts = {"木":0,"火":0,"土":0,"金":0,"水":0};
+      for(const k of Object.keys(counts)){
+        counts[k] = (wxStr.match(new RegExp(k,"g")) || []).length;
+      }
+
+      const weakest = pickWeakest(counts);
+      const colors = colorMap[weakest] || ["#ffffff"];
+      const nums = luckyNumbersFrom(d,t0);
+      const dir = wealthDirToday();
+
+      el("colorV").textContent = (langSel.value==="ja")
+        ? `「${weakest}」を補強`
+        : (langSel.value==="en")
+          ? `Boost "${weakest}"`
+          : `偏「${weakest}」补强`;
+
+      el("swatches").innerHTML = colors.map(c=>`<span class="swatch" style="background:${c}"></span>`).join("");
+      el("numV").textContent = nums;
+      el("dirV").textContent = dir;
+      renderBars(counts);
+
+    }catch(err){
+      alert("生成失败：" + String(err));
+    }
+  });
+
+  // ----------------------------
+  // 背景像素点落下
+  // ----------------------------
+  const canvas = el("pix");
+  const ctx = canvas.getContext("2d");
+  let W=0,H=0,pps=[];
+  function resize(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    W = canvas.width = Math.floor(window.innerWidth * dpr);
+    H = canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function spawn(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const n = 20;
+    const colors = ["#ffcc66","#ff2d2d","#c60b1e","#ffffff","#34c759","#0a84ff"];
+    for(let i=0;i<n;i++){
+      pps.push({
+        x: Math.random()*W,
+        y: -10*dpr,
+        s: (2 + Math.random()*4)*dpr,
+        vy: (0.8 + Math.random()*2.0)*dpr,
+        vx: (-0.5 + Math.random()*1.0)*dpr,
+        c: colors[(Math.random()*colors.length)|0],
+        life: 260 + ((Math.random()*160)|0)
+      });
+    }
+  }
+  setInterval(()=>{ if(document.visibilityState==="visible") spawn(); }, 950);
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    ctx.globalAlpha = 0.9;
+    for(let i=pps.length-1;i>=0;i--){
+      const p = pps[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 1;
+      ctx.fillStyle = p.c;
+      ctx.fillRect((p.x|0), (p.y|0), (p.s|0), (p.s|0));
+      if(p.y > H + 30 || p.life <= 0) pps.splice(i,1);
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // 音乐暂时先不改（按你要求：先做页面）
+  el("btnMusic").addEventListener("click", ()=>{
+    alert("音乐我们下一步一起修复：你现在这个 mp3 Safari 无法解码，需要先转成标准 MP3。");
+  });
+
+  applyLang();
+</script>
+</body>
+</html>
+
