@@ -4,146 +4,459 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>2026 新年运势生成器</title>
+
+  <!-- 像素字体（可选：不影响功能；如果加载慢会自动回退系统字体） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- 八字/五行库 -->
   <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.js"></script>
 
   <style>
     :root{
-      --bg1:#0b0b12; --bg2:#1a0f0f;
-      --stroke:rgba(255,255,255,.16);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --gold:#f6d37a;
+      --bg:#090a10;
+      --panel:#0f1422;
+      --panel2:#0b1020;
+      --ink:#e9eefc;
+      --muted:#a9b2d6;
+      --line:rgba(233,238,252,.16);
+      --gold:#ffd56a;
+      --red:#ff3b30;
+      --green:#34c759;
+      --blue:#0a84ff;
+      --purple:#bf5af2;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --px: 3px;
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
-      margin:0; color:var(--text);
-      font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans","Microsoft Yahei",sans-serif;
+      margin:0;
+      background: radial-gradient(1000px 600px at 20% 10%, rgba(255,59,48,.18), transparent 55%),
+                  radial-gradient(900px 520px at 80% 15%, rgba(255,213,106,.18), transparent 55%),
+                  radial-gradient(900px 520px at 60% 90%, rgba(10,132,255,.12), transparent 55%),
+                  linear-gradient(180deg, #070810, #0a0b14 55%, #060710);
+      color:var(--ink);
+      font-family: system-ui,-apple-system,"PingFang SC","Hiragino Sans","Microsoft Yahei",sans-serif;
+      overflow-x:hidden;
+    }
+
+    /* 像素风：边框与阴影 */
+    .px-panel{
+      background: linear-gradient(180deg, rgba(15,20,34,.92), rgba(11,16,32,.92));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .px-panel:before{
+      content:"";
+      position:absolute; inset:0;
       background:
-        radial-gradient(900px 520px at 85% 15%, rgba(246,211,122,.22), transparent 55%),
-        radial-gradient(1200px 600px at 20% 10%, rgba(255,59,48,.18), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      min-height:100vh;
+        linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,0) 35%),
+        repeating-linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.05) 1px, transparent 1px, transparent 3px);
+      opacity:.25;
+      pointer-events:none;
     }
-    .wrap{max-width:920px;margin:0 auto;padding:22px 14px 70px}
-    .hero{
-      border:1px solid var(--stroke);
-      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 24px 70px rgba(0,0,0,.35);
+
+    .wrap{ max-width: 1080px; margin: 0 auto; padding: 20px 14px 70px; }
+
+    header{ display:flex; gap:12px; align-items:flex-start; justify-content:space-between; }
+    .titleBlock{ padding:16px 16px 12px; flex:1; min-width: 260px; }
+    .kicker{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 10px;
+      border:1px solid rgba(255,213,106,.35);
+      background: rgba(255,213,106,.14);
+      color: var(--ink);
+      border-radius: 999px;
+      font-weight:700;
+      letter-spacing:.5px;
+      font-size:12px;
     }
-    h1{margin:0 0 8px;font-size:28px}
-    .muted{color:var(--muted);line-height:1.7;font-size:13px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-    @media(max-width:820px){.grid{grid-template-columns:1fr}}
-    .card{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.06);
-      border-radius:16px;
+    h1{
+      margin:0 0 8px;
+      font-size: 22px;
+      line-height:1.25;
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      letter-spacing: .5px;
+    }
+    .sub{ margin:0; color: var(--muted); font-size: 13px; line-height:1.6; }
+
+    .langBox{
+      width: 210px;
       padding:16px;
-      box-shadow:0 18px 60px rgba(0,0,0,.25);
     }
-    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    .langRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    select{
+      width: 110px;
+      padding:10px 10px;
+      border-radius: 10px;
+      border:1px solid rgba(233,238,252,.18);
+      background: rgba(0,0,0,.25);
+      color: var(--ink);
+      outline:none;
+      font-weight:600;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 920px){
+      header{ flex-direction:column; }
+      .langBox{ width:100%; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{ padding:16px; }
+    .card h2{
+      margin:0 0 12px;
+      font-size: 14px;
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      letter-spacing:.4px;
+    }
+    label{ display:block; color: var(--muted); font-size: 12px; margin: 10px 0 6px; }
     input{
       width:100%;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.22);
-      color:var(--text);
+      padding:11px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(233,238,252,.18);
+      background: rgba(0,0,0,.25);
+      color: var(--ink);
       outline:none;
     }
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    input:focus{ border-color: rgba(255,213,106,.45); }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
     button{
-      padding:10px 12px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.10);
-      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(233,238,252,.18);
+      background: rgba(233,238,252,.10);
+      color: var(--ink);
       cursor:pointer;
+      font-weight:700;
     }
     button.primary{
-      border-color:rgba(246,211,122,.55);
-      background:rgba(246,211,122,.16);
+      border-color: rgba(255,213,106,.55);
+      background: linear-gradient(180deg, rgba(255,213,106,.24), rgba(255,59,48,.12));
     }
-    .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;
-      border:1px solid rgba(246,211,122,.35);background:rgba(246,211,122,.12)}
-    .out{line-height:1.75;font-size:13px;color:var(--muted);white-space:pre-wrap}
-    .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .swatch{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,.18)}
+    button:hover{ background: rgba(233,238,252,.14); }
+
+    .hint{ margin-top:10px; color: var(--muted); font-size: 12px; line-height:1.6; }
+
+    /* 输出区 */
+    .outBlock{
+      display:grid;
+      gap:12px;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:560px){
+      .kv{ grid-template-columns:1fr; }
+    }
+    .mini{
+      padding:12px;
+      border-radius: 12px;
+      border:1px solid rgba(233,238,252,.16);
+      background: rgba(0,0,0,.20);
+    }
+    .mini .k{ color: var(--muted); font-size: 12px; }
+    .mini .v{ margin-top:6px; font-size: 16px; font-weight:800; }
+
+    /* 五行柱状图 */
+    .bars{ display:grid; gap:10px; }
+    .barRow{
+      display:grid;
+      grid-template-columns: 54px 1fr 36px;
+      gap:10px;
+      align-items:center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .track{
+      height: 12px;
+      border-radius: 999px;
+      border:1px solid rgba(233,238,252,.16);
+      background: rgba(0,0,0,.20);
+      overflow:hidden;
+    }
+    .fill{ height:100%; width:0%; }
+    .swatches{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .swatch{ width:18px; height:18px; border-radius:6px; border:1px solid rgba(233,238,252,.18); }
+
+    /* 像素彩纸 canvas */
+    canvas#pix{ position:fixed; inset:0; pointer-events:none; opacity:.55; }
+
+    /* 小脚注 */
+    .foot{ margin-top:12px; color: var(--muted); font-size: 12px; line-height:1.7; }
+    a{ color: var(--gold); }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <span class="pill">2026</span>
-      <h1>新年运势生成器</h1>
-      <div class="muted">输入出生日期与时间，一键生成：八字、五行、幸运色、财运方位（互动娱乐用途）。音乐需要点击按钮才会播放。</div>
+<canvas id="pix"></canvas>
+
+<div class="wrap">
+  <header>
+    <div class="px-panel titleBlock">
+      <div class="kicker">
+        <span class="badge" id="badgeYear">2026</span>
+        <span class="badge" style="border-color:rgba(10,132,255,.35);background:rgba(10,132,255,.12)" id="badgePixel">PIXEL</span>
+      </div>
+      <h1 id="tTitle">2026 新年运势生成器</h1>
+      <p class="sub" id="tSub">输入出生日期与时间，一键生成：八字、五行、幸运色、财运方位（互动娱乐用途）。</p>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <div style="font-weight:600;margin-bottom:6px">输入信息</div>
-
-        <label>出生日期</label>
-        <input id="birthDate" type="date" />
-
-        <label>出生时间</label>
-        <input id="birthTime" type="time" value="09:00" />
-
-        <div class="actions">
-          <button class="primary" id="btnGen">生成结果</button>
-          <button id="btnMusic">播放音乐</button>
-        </div>
-
-        <audio id="bgm" loop preload="none">
-          <source src="./haoyunlai.mp3" type="audio/mpeg" />
-        </audio>
-
-        <div class="muted" style="margin-top:10px">
-          如果音乐没响：请确认先点“播放音乐”，并且文件就在同目录 newyear2026 下。
-        </div>
+    <div class="px-panel langBox">
+      <div class="langRow">
+        <div style="font-weight:800" id="tLang">语言</div>
+        <select id="lang">
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+        </select>
       </div>
-
-      <div class="card">
-        <div style="font-weight:600;margin-bottom:6px">生成结果</div>
-        <div id="out" class="out">请选择日期/时间，然后点“生成结果”。</div>
+      <div class="hint" id="tLangHint" style="margin-top:10px">
+        语言会自动记住。音乐需点击按钮播放。
       </div>
     </div>
+  </header>
+
+  <div class="grid">
+    <section class="px-panel card">
+      <h2 id="tInput">输入信息</h2>
+
+      <label id="tBirthDate">出生日期</label>
+      <input id="birthDate" type="date" />
+
+      <label id="tBirthTime">出生时间</label>
+      <input id="birthTime" type="time" value="09:00" />
+
+      <div class="actions">
+        <button class="primary" id="btnGen">生成结果</button>
+        <button id="btnMusic">播放音乐</button>
+      </div>
+
+      <audio id="bgm" preload="metadata" loop>
+        <source src="./haoyunlai.mp3" type="audio/mpeg">
+      </audio>
+
+      <div class="hint" id="tMusicHint">
+        如果音乐失败，请先确认 mp3 可直接打开：/newyear2026/haoyunlai.mp3
+      </div>
+    </section>
+
+    <section class="px-panel card">
+      <h2 id="tResult">生成结果</h2>
+      <div id="out" class="outBlock">
+        <div class="hint" id="tPlaceholder">请选择日期/时间，然后点“生成结果”。</div>
+      </div>
+
+      <div class="foot" id="tFoot">
+        说明：本页面为互动展示用途。请勿将结果用于现实决策。
+      </div>
+    </section>
   </div>
+</div>
 
 <script>
-  // 音乐开关（必须用户点击）
-  const bgm = document.getElementById("bgm");
-  const btnMusic = document.getElementById("btnMusic");
-  let playing = false;
-  btnMusic.onclick = async () => {
-    try{
-      if(!playing){
-        await bgm.play();
-        playing = true;
-        btnMusic.textContent = "暂停音乐";
-      }else{
-        bgm.pause();
-        playing = false;
-        btnMusic.textContent = "播放音乐";
-      }
-    }catch(e){
-      alert("音乐播放失败：请确认 haoyunlai.mp3 在 newyear2026 目录里。");
+  // ----------------------------
+  // 多语言文案
+  // ----------------------------
+  const I18N = {
+    zh: {
+      title: "2026 新年运势生成器",
+      sub: "输入出生日期与时间，一键生成：八字、五行、幸运色、财运方位（互动娱乐用途）。",
+      lang: "语言",
+      langHint: "语言会自动记住。音乐需点击按钮播放。",
+      input: "输入信息",
+      birthDate: "出生日期",
+      birthTime: "出生时间",
+      gen: "生成结果",
+      musicPlay: "播放音乐",
+      musicPause: "暂停音乐",
+      musicHint: "如果音乐失败，请先确认 mp3 可直接打开：/newyear2026/haoyunlai.mp3",
+      result: "生成结果",
+      placeholder: "请选择日期/时间，然后点“生成结果”。",
+      foot: "说明：本页面为互动展示用途。请勿将结果用于现实决策。",
+      errNeedDate: "请先选择出生日期。",
+      errBgm404: "音乐加载失败：找不到 haoyunlai.mp3（或 404）。请确认文件在 newyear2026 目录下。",
+      errBgmPolicy: "音乐播放被浏览器拦截：请再点一次“播放音乐”，或检查浏览器的自动播放限制。",
+      errGen: "生成失败：",
+      bazi: "八字",
+      year: "年柱",
+      month: "月柱",
+      day: "日柱",
+      time: "时柱",
+      wuxingChart: "五行柱状图",
+      luckyColor: "2026 幸运色（娱乐版）",
+      wealthDir: "发财运势方位（娱乐版：参考今日财神方位）"
+    },
+    ja: {
+      title: "2026 新年運勢ジェネレーター",
+      sub: "生年月日と時間を入力すると、八字・五行・ラッキーカラー・財運方位を生成します（娯楽用途）。",
+      lang: "言語",
+      langHint: "言語は記憶されます。音楽はボタンで再生します。",
+      input: "入力",
+      birthDate: "生年月日",
+      birthTime: "出生時間",
+      gen: "生成",
+      musicPlay: "音楽再生",
+      musicPause: "一時停止",
+      musicHint: "再生できない場合：/newyear2026/haoyunlai.mp3 を直接開けるか確認してください。",
+      result: "結果",
+      placeholder: "日付/時間を入れて「生成」を押してください。",
+      foot: "注：本ページは娯楽目的です。現実の判断に使用しないでください。",
+      errNeedDate: "先に日付を選択してください。",
+      errBgm404: "音楽の読み込みに失敗：haoyunlai.mp3 が見つからない（404）。newyear2026 にあるか確認してください。",
+      errBgmPolicy: "ブラウザにより再生がブロックされました。もう一度「音楽再生」を押してください。",
+      errGen: "生成失敗：",
+      bazi: "八字",
+      year: "年柱",
+      month: "月柱",
+      day: "日柱",
+      time: "時柱",
+      wuxingChart: "五行グラフ",
+      luckyColor: "2026 ラッキーカラー（娯楽）",
+      wealthDir: "金運方位（娯楽：本日の財神方位）"
+    },
+    en: {
+      title: "2026 Fortune Generator",
+      sub: "Enter your birth date/time to generate BaZi, Five Elements, lucky colors and wealth direction (for fun).",
+      lang: "Language",
+      langHint: "Language is saved. Music plays after clicking the button.",
+      input: "Input",
+      birthDate: "Birth date",
+      birthTime: "Birth time",
+      gen: "Generate",
+      musicPlay: "Play music",
+      musicPause: "Pause",
+      musicHint: "If music fails: open /newyear2026/haoyunlai.mp3 directly to verify it exists.",
+      result: "Result",
+      placeholder: "Pick date/time and click “Generate”.",
+      foot: "Note: For entertainment only. Do not use for real-life decisions.",
+      errNeedDate: "Please select a birth date first.",
+      errBgm404: "Music load failed: haoyunlai.mp3 not found (404). Make sure it’s in /newyear2026/.",
+      errBgmPolicy: "Playback was blocked by the browser. Click “Play music” again or check autoplay settings.",
+      errGen: "Generation failed: ",
+      bazi: "BaZi",
+      year: "Year Pillar",
+      month: "Month Pillar",
+      day: "Day Pillar",
+      time: "Hour Pillar",
+      wuxingChart: "Five Elements chart",
+      luckyColor: "2026 Lucky Colors (for fun)",
+      wealthDir: "Wealth Direction (for fun: today’s 财神方位)"
     }
   };
 
-  // 幸运色映射（补短板五行：娱乐版）
+  const el = (id) => document.getElementById(id);
+  const langSel = el("lang");
+  const savedLang = localStorage.getItem("ny_lang") || "zh";
+  langSel.value = savedLang;
+
+  function t(key){
+    const L = I18N[langSel.value] || I18N.zh;
+    return L[key] ?? I18N.zh[key] ?? key;
+  }
+  function applyLang(){
+    localStorage.setItem("ny_lang", langSel.value);
+    el("tTitle").textContent = t("title");
+    el("tSub").textContent = t("sub");
+    el("tLang").textContent = t("lang");
+    el("tLangHint").textContent = t("langHint");
+    el("tInput").textContent = t("input");
+    el("tBirthDate").textContent = t("birthDate");
+    el("tBirthTime").textContent = t("birthTime");
+    el("btnGen").textContent = t("gen");
+    el("btnMusic").textContent = playing ? t("musicPause") : t("musicPlay");
+    el("tMusicHint").textContent = t("musicHint");
+    el("tResult").textContent = t("result");
+    el("tFoot").textContent = t("foot");
+    if (!hasOutput) el("tPlaceholder").textContent = t("placeholder");
+  }
+  langSel.addEventListener("change", applyLang);
+
+  // ----------------------------
+  // 音乐播放：更准确的错误提示
+  // ----------------------------
+  const bgm = el("bgm");
+  const btnMusic = el("btnMusic");
+  let playing = false;
+
+  async function checkAudioReachable(){
+    // 用 HEAD/GET 测试是否 404
+    try{
+      const res = await fetch("./haoyunlai.mp3", { method:"HEAD", cache:"no-store" });
+      if (!res.ok) return { ok:false, status:res.status };
+      return { ok:true, status:res.status };
+    }catch(e){
+      // 某些情况下 HEAD 会失败，退化为直接尝试播放
+      return { ok:true, status:0, warn:true };
+    }
+  }
+
+  btnMusic.addEventListener("click", async () => {
+    try{
+      if(!playing){
+        const chk = await checkAudioReachable();
+        if(!chk.ok){
+          alert(t("errBgm404") + (chk.status ? ` (HTTP ${chk.status})` : ""));
+          return;
+        }
+        await bgm.play();
+        playing = true;
+      }else{
+        bgm.pause();
+        playing = false;
+      }
+      btnMusic.textContent = playing ? t("musicPause") : t("musicPlay");
+    }catch(e){
+      // play() Promise reject：多数是浏览器策略或解码失败
+      alert(t("errBgmPolicy"));
+    }
+  });
+
+  // ----------------------------
+  // 生成：八字/五行 + 柱状图
+  // ----------------------------
+  const birthDate = el("birthDate");
+  const birthTime = el("birthTime");
+  const out = el("out");
+  let hasOutput = false;
+
+  // 幸运色（补短板：娱乐）
   const colorMap = {
-    "木": ["#3ddc84","#00b894","#34a0ff"],
-    "火": ["#ff3b30","#ff2d55","#ff9f0a"],
-    "土": ["#f6d37a","#c9a227","#a2845e"],
+    "木": ["#34c759","#30d158","#0a84ff"],
+    "火": ["#ff3b30","#ff2d55","#ffd60a"],
+    "土": ["#ffd56a","#c9a227","#a2845e"],
     "金": ["#e5e5ea","#c7c7cc","#d4af37"],
-    "水": ["#0a84ff","#1f2a44","#111111"],
+    "水": ["#0a84ff","#64d2ff","#111111"],
   };
+  const barColor = {
+    "木":"#34c759",
+    "火":"#ff3b30",
+    "土":"#ffd56a",
+    "金":"#e5e5ea",
+    "水":"#0a84ff",
+  };
+
   function pickWeakest(counts){
     let kMin="木", min=1e9;
-    for(const k of Object.keys(counts)){ if(counts[k]<min){min=counts[k];kMin=k;} }
+    for(const k of Object.keys(counts)){
+      if(counts[k] < min){ min = counts[k]; kMin = k; }
+    }
     return kMin;
   }
   function swatches(colors){
@@ -156,17 +469,40 @@
     try{
       const s = lunarObj.toFullString ? lunarObj.toFullString() : "";
       const m = s.match(/财神方位\[(.*?)\]/);
-      return m ? m[1] : "（未获取到）";
+      return m ? m[1] : "—";
     }catch(_){}
-    return "（未获取到）";
+    return "—";
   }
 
-  const out = document.getElementById("out");
-  const birthDate = document.getElementById("birthDate");
-  const birthTime = document.getElementById("birthTime");
+  function renderBars(counts){
+    const max = Math.max(...Object.values(counts), 1);
+    const order = ["木","火","土","金","水"];
+    return `
+      <div class="mini">
+        <div class="k">${t("wuxingChart")}</div>
+        <div class="bars" style="margin-top:10px">
+          ${order.map(k=>{
+            const w = Math.round((counts[k]/max)*100);
+            return `
+              <div class="barRow">
+                <div>${k}</div>
+                <div class="track">
+                  <div class="fill" style="width:${w}%; background:${barColor[k] || "#fff"}"></div>
+                </div>
+                <div style="text-align:right">${counts[k]}</div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
 
-  document.getElementById("btnGen").onclick = () => {
-    if(!birthDate.value){ out.textContent="请先选择出生日期。"; return; }
+  el("btnGen").addEventListener("click", () => {
+    if(!birthDate.value){
+      alert(t("errNeedDate"));
+      return;
+    }
 
     const [y,m,d] = birthDate.value.split("-").map(n=>parseInt(n,10));
     const [hh,mm] = (birthTime.value || "09:00").split(":").map(n=>parseInt(n,10));
@@ -197,30 +533,92 @@
       for(const k of Object.keys(counts)){
         counts[k] = (wxStr.match(new RegExp(k,"g")) || []).length;
       }
+
       const weakest = pickWeakest(counts);
       const colors = colorMap[weakest] || ["#ffffff"];
       const cai = safeCaiPosition(Lunar.fromDate(new Date()));
 
-      out.innerHTML =
-`【八字】
-年柱：${yearP}
-月柱：${monthP}
-日柱：${dayP}
-时柱：${timeP}
+      hasOutput = true;
+      out.innerHTML = `
+        <div class="kv">
+          <div class="mini">
+            <div class="k">${t("bazi")}</div>
+            <div class="v" style="font-size:14px; margin-top:10px; line-height:1.8">
+              ${t("year")}: <span style="color:var(--ink)">${yearP}</span><br/>
+              ${t("month")}: <span style="color:var(--ink)">${monthP}</span><br/>
+              ${t("day")}: <span style="color:var(--ink)">${dayP}</span><br/>
+              ${t("time")}: <span style="color:var(--ink)">${timeP}</span>
+            </div>
+          </div>
 
-【五行统计】（按八字柱五行统计）
-木:${counts["木"]}  火:${counts["火"]}  土:${counts["土"]}  金:${counts["金"]}  水:${counts["水"]}
+          <div class="mini">
+            <div class="k">${t("luckyColor")}（${weakest}）</div>
+            ${swatches(colors)}
+            <div class="k" style="margin-top:10px">${t("wealthDir")}</div>
+            <div class="v" style="font-size:14px; margin-top:8px">${cai}</div>
+          </div>
+        </div>
 
-【2026 幸运色】（娱乐版：补短板五行 → ${weakest}）
-${swatches(colors)}
-
-【发财运势方位】（娱乐版：参考“今日财神方位”）
-${cai}
-`;
+        ${renderBars(counts)}
+      `;
     }catch(err){
-      out.textContent = "生成失败：\n" + String(err) + "\n\n如果失败：检查 lunar.js CDN 是否正常加载。";
+      alert(t("errGen") + String(err));
     }
-  };
+  });
+
+  // ----------------------------
+  // 像素彩纸背景（轻量）
+  // ----------------------------
+  const canvas = el("pix");
+  const ctx = canvas.getContext("2d");
+  let W=0,H=0,pps=[];
+  function resize(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    W = canvas.width = Math.floor(window.innerWidth * dpr);
+    H = canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function spawn(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const n = 18;
+    const colors = ["#ffd56a","#ff3b30","#34c759","#0a84ff","#bf5af2"];
+    for(let i=0;i<n;i++){
+      pps.push({
+        x: Math.random()*W,
+        y: -10*dpr,
+        s: (2 + Math.random()*4)*dpr,
+        vy: (0.6 + Math.random()*1.8)*dpr,
+        vx: (-0.4 + Math.random()*0.8)*dpr,
+        c: colors[(Math.random()*colors.length)|0],
+        life: 240 + ((Math.random()*120)|0)
+      });
+    }
+  }
+  setInterval(()=>{ if(document.visibilityState==="visible") spawn(); }, 1200);
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    ctx.globalAlpha = 0.9;
+    for(let i=pps.length-1;i>=0;i--){
+      const p = pps[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 1;
+      ctx.fillStyle = p.c;
+      // 像素方块
+      ctx.fillRect((p.x|0), (p.y|0), (p.s|0), (p.s|0));
+      if(p.y > H + 20 || p.life <= 0) pps.splice(i,1);
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // init lang
+  applyLang();
 </script>
 </body>
 </html>
