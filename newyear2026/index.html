@@ -67,4 +67,160 @@
     }
     .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;
       border:1px solid rgba(246,211,122,.35);background:rgba(246,211,122,.12)}
-    .out{line-height:1.75;font-size:13px;color:var(--mute
+    .out{line-height:1.75;font-size:13px;color:var(--muted);white-space:pre-wrap}
+    .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .swatch{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,.18)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <span class="pill">2026</span>
+      <h1>新年运势生成器</h1>
+      <div class="muted">输入出生日期与时间，一键生成：八字、五行、幸运色、财运方位（互动娱乐用途）。音乐需要点击按钮才会播放。</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div style="font-weight:600;margin-bottom:6px">输入信息</div>
+
+        <label>出生日期</label>
+        <input id="birthDate" type="date" />
+
+        <label>出生时间</label>
+        <input id="birthTime" type="time" value="09:00" />
+
+        <div class="actions">
+          <button class="primary" id="btnGen">生成结果</button>
+          <button id="btnMusic">播放音乐</button>
+        </div>
+
+        <audio id="bgm" loop preload="none">
+          <source src="./haoyunlai.mp3" type="audio/mpeg" />
+        </audio>
+
+        <div class="muted" style="margin-top:10px">
+          如果音乐没响：请确认先点“播放音乐”，并且文件就在同目录 newyear2026 下。
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:600;margin-bottom:6px">生成结果</div>
+        <div id="out" class="out">请选择日期/时间，然后点“生成结果”。</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // 音乐开关（必须用户点击）
+  const bgm = document.getElementById("bgm");
+  const btnMusic = document.getElementById("btnMusic");
+  let playing = false;
+  btnMusic.onclick = async () => {
+    try{
+      if(!playing){
+        await bgm.play();
+        playing = true;
+        btnMusic.textContent = "暂停音乐";
+      }else{
+        bgm.pause();
+        playing = false;
+        btnMusic.textContent = "播放音乐";
+      }
+    }catch(e){
+      alert("音乐播放失败：请确认 haoyunlai.mp3 在 newyear2026 目录里。");
+    }
+  };
+
+  // 幸运色映射（补短板五行：娱乐版）
+  const colorMap = {
+    "木": ["#3ddc84","#00b894","#34a0ff"],
+    "火": ["#ff3b30","#ff2d55","#ff9f0a"],
+    "土": ["#f6d37a","#c9a227","#a2845e"],
+    "金": ["#e5e5ea","#c7c7cc","#d4af37"],
+    "水": ["#0a84ff","#1f2a44","#111111"],
+  };
+  function pickWeakest(counts){
+    let kMin="木", min=1e9;
+    for(const k of Object.keys(counts)){ if(counts[k]<min){min=counts[k];kMin=k;} }
+    return kMin;
+  }
+  function swatches(colors){
+    return `<div class="swatches">${colors.map(c=>`<span class="swatch" style="background:${c}"></span>`).join("")}</div>`;
+  }
+  function safeCaiPosition(lunarObj){
+    try{
+      if(typeof lunarObj.getPositionCai === "function") return String(lunarObj.getPositionCai());
+    }catch(_){}
+    try{
+      const s = lunarObj.toFullString ? lunarObj.toFullString() : "";
+      const m = s.match(/财神方位\[(.*?)\]/);
+      return m ? m[1] : "（未获取到）";
+    }catch(_){}
+    return "（未获取到）";
+  }
+
+  const out = document.getElementById("out");
+  const birthDate = document.getElementById("birthDate");
+  const birthTime = document.getElementById("birthTime");
+
+  document.getElementById("btnGen").onclick = () => {
+    if(!birthDate.value){ out.textContent="请先选择出生日期。"; return; }
+
+    const [y,m,d] = birthDate.value.split("-").map(n=>parseInt(n,10));
+    const [hh,mm] = (birthTime.value || "09:00").split(":").map(n=>parseInt(n,10));
+
+    try{
+      const solar = Solar.fromYmdHms(y, m, d, hh, mm, 0);
+      const lunarObj = solar.getLunar();
+
+      let yearP="—", monthP="—", dayP="—", timeP="—";
+      let wxStr = "";
+
+      if(typeof lunarObj.getEightChar === "function"){
+        const ec = lunarObj.getEightChar();
+        if(ec){
+          if(typeof ec.getYear === "function") yearP = String(ec.getYear());
+          if(typeof ec.getMonth === "function") monthP = String(ec.getMonth());
+          if(typeof ec.getDay === "function") dayP = String(ec.getDay());
+          if(typeof ec.getTime === "function") timeP = String(ec.getTime());
+
+          if(typeof ec.getYearWuXing === "function") wxStr += String(ec.getYearWuXing());
+          if(typeof ec.getMonthWuXing === "function") wxStr += String(ec.getMonthWuXing());
+          if(typeof ec.getDayWuXing === "function") wxStr += String(ec.getDayWuXing());
+          if(typeof ec.getTimeWuXing === "function") wxStr += String(ec.getTimeWuXing());
+        }
+      }
+
+      const counts = {"木":0,"火":0,"土":0,"金":0,"水":0};
+      for(const k of Object.keys(counts)){
+        counts[k] = (wxStr.match(new RegExp(k,"g")) || []).length;
+      }
+      const weakest = pickWeakest(counts);
+      const colors = colorMap[weakest] || ["#ffffff"];
+      const cai = safeCaiPosition(Lunar.fromDate(new Date()));
+
+      out.innerHTML =
+`【八字】
+年柱：${yearP}
+月柱：${monthP}
+日柱：${dayP}
+时柱：${timeP}
+
+【五行统计】（按八字柱五行统计）
+木:${counts["木"]}  火:${counts["火"]}  土:${counts["土"]}  金:${counts["金"]}  水:${counts["水"]}
+
+【2026 幸运色】（娱乐版：补短板五行 → ${weakest}）
+${swatches(colors)}
+
+【发财运势方位】（娱乐版：参考“今日财神方位”）
+${cai}
+`;
+    }catch(err){
+      out.textContent = "生成失败：\n" + String(err) + "\n\n如果失败：检查 lunar.js CDN 是否正常加载。";
+    }
+  };
+</script>
+</body>
+</html>
