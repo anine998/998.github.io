@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-  <!-- lunar-javascript (用于农历/八字相关能力；这里用于方位与五行提取的辅助) -->
+  <!-- lunar-javascript -->
   <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.js"></script>
 
   <style>
@@ -47,7 +47,7 @@
 
     /* 宽度自适应：随屏幕变宽，但留边距 */
     .wrap{
-      width: min(1600px, calc(100vw - 32px));
+      width: min(1680px, calc(100vw - 32px));
       margin: 0 auto;
       padding: 18px 0 70px;
       position:relative;
@@ -158,9 +158,9 @@
       border-radius: 16px;
       border: 1px solid rgba(255,247,242,.25);
       background:
-        radial-gradient(380px 220px at 18% 40%, rgba(255,204,102,.18), transparent 62%),
-        radial-gradient(420px 240px at 82% 30%, rgba(255,255,255,.10), transparent 70%),
-        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,0));
+        radial-gradient(420px 240px at 18% 40%, rgba(255,204,102,.20), transparent 62%),
+        radial-gradient(520px 280px at 82% 30%, rgba(255,255,255,.12), transparent 70%),
+        linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,0));
       padding: 16px 16px 18px;
       overflow:hidden;
       position:relative;
@@ -172,6 +172,29 @@
       opacity:.16;
       pointer-events:none;
     }
+
+    /* 顶部动效：扫光 */
+    .heroBanner:after{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-40%;
+      width:60%;
+      height:180%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+      transform: rotate(18deg);
+      animation: sweep 3.8s ease-in-out infinite;
+      pointer-events:none;
+      opacity:.55;
+      filter: blur(0.2px);
+    }
+    @keyframes sweep{
+      0%{ transform: translateX(-20%) rotate(18deg); opacity:.0; }
+      12%{ opacity:.35; }
+      50%{ transform: translateX(160%) rotate(18deg); opacity:.18; }
+      100%{ transform: translateX(160%) rotate(18deg); opacity:0; }
+    }
+
     .heroRow{
       display:flex;
       align-items:center;
@@ -183,44 +206,88 @@
     .heroText{ min-width:0; }
     .heroTitle{
       font-family: "Press Start 2P", system-ui, sans-serif;
-      font-size: clamp(44px, 6.2vw, 88px);
+      font-size: clamp(44px, 6.2vw, 90px);
       letter-spacing: 2px;
       line-height:1.05;
       margin: 0;
       color: var(--gold);
-      text-shadow: 0 0 26px rgba(255,204,102,.20);
+      text-shadow: 0 0 26px rgba(255,204,102,.22);
+      animation: titleFloat 2.6s ease-in-out infinite;
     }
+    @keyframes titleFloat{
+      0%,100%{ transform: translateY(0px); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+      50%{ transform: translateY(-3px); filter: drop-shadow(0 10px 16px rgba(0,0,0,.16)); }
+    }
+
     .heroSub{
       margin: 12px 0 0;
       font-size: 13px;
       color: rgba(255,247,242,.90);
       line-height:1.7;
-      max-width: 880px;
+      max-width: 900px;
+      position:relative;
     }
 
-    /* 财神像素卡 */
+    /* 星星小动效（在标题旁闪） */
+    .spark{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+    }
+    .spark i{
+      position:absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(255,204,102,.95);
+      box-shadow: 0 0 18px rgba(255,204,102,.55);
+      border-radius: 2px;
+      opacity:0;
+      animation: twinkle 2.4s ease-in-out infinite;
+    }
+    .spark i:nth-child(1){ left: 18%; top: 18%; animation-delay: .2s; }
+    .spark i:nth-child(2){ left: 34%; top: 10%; animation-delay: .9s; }
+    .spark i:nth-child(3){ left: 52%; top: 24%; animation-delay: 1.4s; }
+    .spark i:nth-child(4){ left: 64%; top: 12%; animation-delay: 1.9s; }
+    @keyframes twinkle{
+      0%{ transform: scale(.6) rotate(0deg); opacity:0; }
+      20%{ opacity:.9; }
+      45%{ transform: scale(1.1) rotate(18deg); opacity:.9; }
+      70%{ opacity:0; }
+      100%{ transform: scale(.6) rotate(0deg); opacity:0; }
+    }
+
+    /* 财神像素卡（整体微微呼吸） */
     .caiWrap{
       flex: 0 0 auto;
-      width: clamp(92px, 12vw, 150px);
+      width: clamp(110px, 14vw, 178px);
       aspect-ratio: 1 / 1;
       border-radius: 16px;
       border: 1px solid rgba(255,247,242,.25);
-      background: radial-gradient(120px 120px at 40% 30%, rgba(255,204,102,.18), transparent 60%),
-                  linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,0));
+      background:
+        radial-gradient(120px 120px at 40% 30%, rgba(255,204,102,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,0));
       display:flex;
       align-items:center;
       justify-content:center;
       box-shadow: 0 12px 30px rgba(0,0,0,.18);
+      animation: caiBob 2.2s ease-in-out infinite;
+      transform-origin: 50% 60%;
+    }
+    @keyframes caiBob{
+      0%,100%{ transform: translateY(0px) rotate(0deg); }
+      50%{ transform: translateY(-3px) rotate(-.6deg); }
     }
     .caiSvg{
-      width: 86%;
-      height: 86%;
+      width: 88%;
+      height: 88%;
       image-rendering: pixelated;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,.22));
+      filter: drop-shadow(0 7px 14px rgba(0,0,0,.20));
     }
+
     @media (max-width: 720px){
       .heroRow{ flex-direction:column; align-items:flex-start; }
-      .caiWrap{ width: 130px; }
+      .caiWrap{ width: 148px; }
     }
 
     /* 白色“贺卡内容区” */
@@ -393,6 +460,10 @@
 
     <div class="hero">
       <div class="heroBanner">
+        <div class="spark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </div>
+
         <div class="heroRow">
           <div class="heroText">
             <h1 class="heroTitle">LUCK 2026</h1>
@@ -401,50 +472,82 @@
             </p>
           </div>
 
-          <!-- 像素财神（SVG，不用外部图片） -->
+          <!-- 更可爱：腮红 + 发财牌子 -->
           <div class="caiWrap" aria-hidden="true" title="财神">
-            <svg class="caiSvg" viewBox="0 0 32 32" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
-              <rect width="32" height="32" fill="none"/>
+            <svg class="caiSvg" viewBox="0 0 48 48" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" fill="none"/>
 
-              <!-- 帽子 -->
-              <rect x="8" y="2" width="16" height="6" fill="#d40b1e"/>
-              <rect x="6" y="6" width="20" height="4" fill="#b10718"/>
-              <rect x="10" y="1" width="12" height="2" fill="#ff4b4b"/>
+              <!-- 帽子（红） -->
+              <rect x="12" y="3" width="24" height="8" fill="#d40b1e"/>
+              <rect x="10" y="10" width="28" height="5" fill="#b10718"/>
+              <rect x="14" y="1" width="20" height="3" fill="#ff4b4b"/>
 
-              <!-- 帽徽 -->
-              <rect x="14" y="4" width="4" height="4" rx="1" fill="#ffcc66"/>
-              <rect x="15" y="5" width="2" height="2" fill="#f7b83a"/>
+              <!-- 帽徽（金） -->
+              <rect x="22" y="6" width="4" height="6" rx="1" fill="#ffcc66"/>
+              <rect x="23" y="7" width="2" height="4" fill="#f7b83a"/>
 
-              <!-- 脸 -->
-              <rect x="10" y="10" width="12" height="10" fill="#ffd7b0"/>
-              <rect x="9" y="11" width="1" height="8" fill="#f2c59a"/>
-              <rect x="22" y="11" width="1" height="8" fill="#f2c59a"/>
+              <!-- 脸（肤色） -->
+              <rect x="14" y="16" width="20" height="16" fill="#ffd7b0"/>
+              <rect x="13" y="17" width="1" height="14" fill="#f2c59a"/>
+              <rect x="34" y="17" width="1" height="14" fill="#f2c59a"/>
 
               <!-- 眼睛 -->
-              <rect x="13" y="14" width="2" height="2" fill="#2b0b10"/>
-              <rect x="17" y="14" width="2" height="2" fill="#2b0b10"/>
-              <rect x="13" y="14" width="1" height="1" fill="#ffffff"/>
-              <rect x="17" y="14" width="1" height="1" fill="#ffffff"/>
+              <rect x="19" y="22" width="3" height="3" fill="#2b0b10"/>
+              <rect x="27" y="22" width="3" height="3" fill="#2b0b10"/>
+              <rect x="19" y="22" width="1" height="1" fill="#ffffff"/>
+              <rect x="27" y="22" width="1" height="1" fill="#ffffff"/>
+
+              <!-- 腮红（可爱加成） -->
+              <rect x="16" y="26" width="3" height="2" fill="#ff7aa2"/>
+              <rect x="29" y="26" width="3" height="2" fill="#ff7aa2"/>
+
+              <!-- 小嘴 -->
+              <rect x="23" y="27" width="2" height="1" fill="#b10718"/>
 
               <!-- 胡子 -->
-              <rect x="12" y="18" width="8" height="3" fill="#ffffff"/>
-              <rect x="11" y="20" width="10" height="3" fill="#f2f2f2"/>
-              <rect x="13" y="21" width="6" height="2" fill="#ffffff"/>
+              <rect x="18" y="30" width="12" height="3" fill="#ffffff"/>
+              <rect x="17" y="33" width="14" height="4" fill="#f2f2f2"/>
+              <rect x="20" y="35" width="8" height="2" fill="#ffffff"/>
 
-              <!-- 衣服 -->
-              <rect x="7" y="20" width="18" height="10" fill="#d40b1e"/>
-              <rect x="9" y="22" width="14" height="8" fill="#b10718"/>
+              <!-- 衣服（红） -->
+              <rect x="10" y="30" width="28" height="16" fill="#d40b1e"/>
+              <rect x="12" y="33" width="24" height="13" fill="#b10718"/>
 
               <!-- 金边 -->
-              <rect x="7" y="20" width="18" height="1" fill="#ffcc66"/>
-              <rect x="7" y="29" width="18" height="1" fill="#ffcc66"/>
-              <rect x="7" y="20" width="1" height="10" fill="#ffcc66"/>
-              <rect x="24" y="20" width="1" height="10" fill="#ffcc66"/>
+              <rect x="10" y="30" width="28" height="1" fill="#ffcc66"/>
+              <rect x="10" y="45" width="28" height="1" fill="#ffcc66"/>
+              <rect x="10" y="30" width="1" height="16" fill="#ffcc66"/>
+              <rect x="37" y="30" width="1" height="16" fill="#ffcc66"/>
 
-              <!-- 元宝 -->
-              <rect x="12" y="24" width="8" height="5" fill="#ffcc66"/>
-              <rect x="13" y="25" width="6" height="3" fill="#f7b83a"/>
-              <rect x="15" y="26" width="2" height="1" fill="#ffffff"/>
+              <!-- 手臂（举牌子） -->
+              <rect x="7" y="34" width="6" height="6" fill="#d40b1e"/>
+              <rect x="35" y="34" width="6" height="6" fill="#d40b1e"/>
+              <rect x="8" y="36" width="4" height="4" fill="#b10718"/>
+              <rect x="36" y="36" width="4" height="4" fill="#b10718"/>
+
+              <!-- 发财牌子（白底金边） -->
+              <rect x="14" y="36" width="20" height="9" fill="#fff7f2"/>
+              <rect x="14" y="36" width="20" height="1" fill="#ffcc66"/>
+              <rect x="14" y="44" width="20" height="1" fill="#ffcc66"/>
+              <rect x="14" y="36" width="1" height="9" fill="#ffcc66"/>
+              <rect x="33" y="36" width="1" height="9" fill="#ffcc66"/>
+
+              <!-- 牌子文字：发 财（像素字） -->
+              <!-- 发 -->
+              <rect x="18" y="38" width="1" height="5" fill="#2b0b10"/>
+              <rect x="19" y="39" width="5" height="1" fill="#2b0b10"/>
+              <rect x="20" y="41" width="4" height="1" fill="#2b0b10"/>
+              <rect x="22" y="38" width="1" height="5" fill="#2b0b10"/>
+              <!-- 财 -->
+              <rect x="26" y="38" width="1" height="5" fill="#2b0b10"/>
+              <rect x="27" y="39" width="5" height="1" fill="#2b0b10"/>
+              <rect x="28" y="41" width="4" height="1" fill="#2b0b10"/>
+              <rect x="30" y="38" width="1" height="5" fill="#2b0b10"/>
+
+              <!-- 元宝（金） -->
+              <rect x="20" y="42" width="8" height="4" fill="#ffcc66"/>
+              <rect x="21" y="43" width="6" height="2" fill="#f7b83a"/>
+              <rect x="23" y="44" width="2" height="1" fill="#ffffff"/>
             </svg>
           </div>
         </div>
@@ -678,7 +781,6 @@
       const solar = Solar.fromYmdHms(y,m,day,hh,mm,0);
       const lunarObj = solar.getLunar();
 
-      // 从八字/五行字符串中统计出现次数（娱乐用）
       let wxStr = "";
       const ec = lunarObj.getEightChar ? lunarObj.getEightChar() : null;
       if(ec){
@@ -732,8 +834,8 @@
 
   function spawn(){
     const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const n = 20;
-    const colors = ["#ffcc66","#ff2d2d","#c60b1e","#ffffff","#34c759","#0a84ff"];
+    const n = 18;
+    const colors = ["#ffcc66","#ff2d2d","#c60b1e","#ffffff","#ff7aa2","#0a84ff"];
     for(let i=0;i<n;i++){
       pps.push({
         x: Math.random()*W,
@@ -765,13 +867,13 @@
   tick();
 
   // ----------------------------
-  // 音乐：先占位（你说稍后再修）
+  // 音乐：先占位（你说后面再一起修）
   // ----------------------------
   el("btnMusic").addEventListener("click", ()=>{
-    alert("音乐下一步一起修：你当前 mp3 在 Safari 无法解码，需要先转成标准 MP3。");
+    alert("音乐下一步一起修：你当前 mp3 在 Safari 可能无法解码，需要先转成标准 MP3（CBR 128/192）或 AAC。");
   });
 
-  // 默认日期为今天（方便试玩）
+  // 默认日期为今天
   const today = new Date();
   const pad = (n)=>String(n).padStart(2,"0");
   el("birthDate").value = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
@@ -780,5 +882,3 @@
 </script>
 </body>
 </html>
-
-
